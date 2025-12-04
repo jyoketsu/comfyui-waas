@@ -1,0 +1,24 @@
+:root {
+  --el-menu-item-height: 36px;
+  --el-menu-sub-item-height: 36px;
+}
+
+.el-breadcrumb__inner.is-link {
+  font-weight: normal;
+}
+
+.el-button {
+  padding: 8px 15px;
+}
+
+.el-input-number {
+  width: 100% !important;
+}
+.medium-zoom-overlay {
+  background: var(--el-bg-color) !important;
+  z-index: 999;
+}
+
+.medium-zoom-image.medium-zoom-image--opened {
+  z-index: 999;
+}

@@ -1,0 +1,1 @@
+import{_ as e}from"./index-DXq2Bj_e.js";import{v as o,x as c}from"./vue-CQuto3dB.js";import"./element-Dv_h71Q3.js";const t={},r={class:"home size-full flex bg-white dark:bg-zinc-700"};function s(n,i){return c(),o("div",r," comfyui ")}const m=e(t,[["render",s]]);export{m as default};
