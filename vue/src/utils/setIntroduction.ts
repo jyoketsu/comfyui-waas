@@ -1,7 +1,7 @@
 // 字体图标 url
-const cssCdnUrlList: Array<string> = ['//at.alicdn.com/t/c/font_3639604_s5x2jsb5drg.css'];
+const cssCdnUrlList: Array<string> = ['//at.alicdn.com/t/c/font_4550176_pu01q4or0ag.css'];
 // 第三方 js url
-const jsCdnUrlList: Array<string> = ['//at.alicdn.com/t/c/font_3639604_qvlhzn0x29h.js'];
+const jsCdnUrlList: Array<string> = ['//at.alicdn.com/t/c/font_4550176_pu01q4or0ag.js'];
 
 // 动态批量设置字体图标
 export function setCssCdn() {

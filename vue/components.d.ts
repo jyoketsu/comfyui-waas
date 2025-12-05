@@ -9,8 +9,13 @@ declare module 'vue' {
   export interface GlobalComponents {
     Badge: typeof import('./src/components/common/Badge.vue')['default']
     Cropper: typeof import('./src/components/common/ImageCropUploader/Cropper.vue')['default']
+    ElButton: typeof import('element-plus/es')['ElButton']
+    ElCheckbox: typeof import('element-plus/es')['ElCheckbox']
     ElConfigProvider: typeof import('element-plus/es')['ElConfigProvider']
+    ElDialog: typeof import('element-plus/es')['ElDialog']
+    ElInput: typeof import('element-plus/es')['ElInput']
     ElPagination: typeof import('element-plus/es')['ElPagination']
+    ElScrollbar: typeof import('element-plus/es')['ElScrollbar']
     Iconfont: typeof import('./src/components/common/Iconfont.vue')['default']
     ImageCropUploader: typeof import('./src/components/common/ImageCropUploader/index.vue')['default']
     MarkdownEditor: typeof import('./src/components/common/MarkdownEditor.vue')['default']
@@ -21,5 +26,8 @@ declare module 'vue' {
     Tab: typeof import('./src/components/common/Tab.vue')['default']
     TabNav: typeof import('./src/components/common/TabNav.vue')['default']
     Webview: typeof import('./src/components/common/Webview.vue')['default']
+  }
+  export interface ComponentCustomProperties {
+    vLoading: typeof import('element-plus/es')['ElLoadingDirective']
   }
 }

@@ -1,12 +1,18 @@
 html.dark {
   color-scheme: dark;
-  --el-color-primary: #41b882;
-  --el-color-primary-light-3: #049f59;
-  --el-color-primary-light-5: #047341;
-  --el-color-primary-light-7: #024c2b;
-  --el-color-primary-light-8: #012e1a;
-  --el-color-primary-light-9: #01190e;
-  --el-color-primary-dark-2: #359e6d;
+  --el-color-primary: #11A1FF;
+  --el-color-primary-light-3: #0C7FCC;
+  /* 比主色暗 30% */
+  --el-color-primary-light-5: #095E99;
+  /* 比主色暗 50% */
+  --el-color-primary-light-7: #063D66;
+  /* 比主色暗 70% */
+  --el-color-primary-light-8: #042C4C;
+  /* 比主色暗 80% */
+  --el-color-primary-light-9: #021B33;
+  /* 比主色暗 90% */
+  --el-color-primary-dark-2: #13B3FF;
+  /* 比主色亮 20% */
   --el-color-success: #67c23a;
   --el-color-success-light-3: #4e8e2f;
   --el-color-success-light-5: #3e6b27;
@@ -50,7 +56,7 @@ html.dark {
     0px 12px 32px #000000, 0px 8px 16px -8px #000000;
   --el-bg-color-page: #0a0a0a;
   --el-bg-color: #141414;
-  --el-bg-color-overlay: #1d1e1f;
+  --el-bg-color-overlay: #363636;
   --el-text-color-primary: #e5eaf3;
   --el-text-color-regular: #cfd3dc;
   --el-text-color-secondary: #a3a6ad;
@@ -72,12 +78,15 @@ html.dark {
   --el-mask-color: rgba(0, 0, 0, 0.8);
   --el-mask-color-extra-light: rgba(0, 0, 0, 0.3);
 }
+
 html.dark .el-button {
   --el-button-disabled-text-color: rgba(255, 255, 255, 0.5);
 }
+
 html.dark .el-card {
   --el-card-bg-color: var(--el-bg-color-overlay);
 }
+
 html.dark .el-empty {
   --el-empty-fill-color-0: var(--el-color-black);
   --el-empty-fill-color-1: #4b4b52;
@@ -90,6 +99,7 @@ html.dark .el-empty {
   --el-empty-fill-color-8: #1c1d1f;
   --el-empty-fill-color-9: #18181a;
 }
+
 html.dark .el-menu {
   --el-menu-hover-bg-color: var(--el-color-primary-light-8);
 }

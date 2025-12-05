@@ -6,8 +6,9 @@
 	border-radius: 40px;
 	cursor: pointer;
 	z-index: 999999;
-	background-color: #6b6b6b;
+	background-color: #363636;
 	overflow: hidden;
+	box-shadow: 0 0 10px #888;
 }
 
 #comfyui-waas-logo {
@@ -32,9 +33,13 @@
 .comfyui-waas-dropdown-btn {
 	height: 22px;
 	font-size: 12px;
-	background-color: #6b6b6b !important;
+	background-color: #363636 !important;
 	color: #FFF !important;
 	border: none;
 	width: 100%;
 	cursor: pointer;
+}
+
+iframe {
+	border: none;
 }
