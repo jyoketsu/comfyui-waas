@@ -43,7 +43,7 @@ browser_app.add_routes([
 ])
 server.PromptServer.instance.app.add_subapp("/browser/", browser_app)
 
-WEB_DIRECTORY = "web"
+WEB_DIRECTORY = "./web"
 NODE_CLASS_MAPPINGS = {
     "LoadImageByUrl //Browser": load_image_by_url.LoadImageByUrl,
     "SelectInputs //Browser": select_inputs.SelectInputs,

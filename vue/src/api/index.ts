@@ -1,9 +1,9 @@
-import { useMessage } from "@/Hooks/message";
 import axios from "axios";
 import { refreshToken } from "./auth";
 import Cookies from "js-cookie";
 import { ApiResponse } from "@/interface/ApiResponse";
 import { User } from "@/interface/User";
+import { ElMessage } from "element-plus";
 
 export const request = {
   get(path: string, params?: object) {
@@ -159,7 +159,7 @@ axios.interceptors.response.use(
         isRefreshing = false;
       }
     } else {
-      useMessage().error(
+      ElMessage.error(
         error.response && error.response.data
           ? (error.response.data.error ? error.response.data.error.message : error.response.data.message)
           : error.message

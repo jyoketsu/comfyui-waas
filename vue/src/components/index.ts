@@ -18,7 +18,6 @@ import {
   Soup,
 } from "lucide-vue-next";
 import Pagination from "@/components/pagination/index.vue";
-import RightToolbar from "@/components/rightToolbar/index.vue";
 
 export default {
   install: (app: any) => {
@@ -29,7 +28,6 @@ export default {
     app.component("Hammer", Hammer);
     app.component("LineChart", LineChart);
     app.component("Pagination", Pagination);
-    app.component("RightToolbar", RightToolbar);
     app.component("GanttChart", GanttChart);
     app.component("Business", BriefcaseBusiness);
     app.component("BookA", BookA);

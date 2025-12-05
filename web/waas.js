@@ -78,7 +78,7 @@ class BrowserDialog extends ComfyDialog {
   createButtons() {
     const closeBtn = $el("button", {
       type: "button",
-      textContent: "Close",
+      textContent: "关闭",
       onclick: () => this.close(),
     });
     const browseBtn = $el("a", {
@@ -87,12 +87,12 @@ class BrowserDialog extends ComfyDialog {
     }, [
       $el("button", {
         type: "button",
-        textContent: "Browse in new tab",
+        textContent: "在新标签页中打开",
       }),
     ]);
     const toggleSidePanelBtn = $el("button", {
       type: "button",
-      textContent: "Side/Center",
+      textContent: "侧边/居中",
       onclick: () => this.toggleSidePanel(),
     });
     return [
@@ -104,16 +104,6 @@ class BrowserDialog extends ComfyDialog {
         closeBtn,
         browseBtn,
         toggleSidePanelBtn,
-        /*$el("span", {*/
-        /*textContent: "Tips: press 'B' to toggle me",*/
-        /*style: {*/
-        /*color: "var(--input-text)",*/
-        /*right: 0,*/
-        /*position: "absolute",*/
-        /*lineHeight: "28.5px",*/
-        /*marginRight: "2px",*/
-        /*},*/
-        /*}),*/
       ]),
     ];
   }
@@ -208,10 +198,17 @@ function showToast(text, onClick) {
 }
 
 app.registerExtension({
-  name: "ComfyUI.Waas",
+  name: "comfyui.waas",
   init() {
   },
   async setup() {
+    console.log("[waas] ------------------------------------------------");
+    // 自动加载 CSS
+    const link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.href = "/extensions/comfyui-waas/waas.css";
+    document.head.appendChild(link);
+
     const browserDialog = new BrowserDialog();
 
     document.addEventListener('keydown', (event) => {
@@ -308,34 +305,97 @@ app.registerExtension({
     // ============================
     var isDragging = false;
 
+    function showDropdown() {
+      document.getElementById("comfyui-waas-dropdown").style.height = '90px';
+      document.getElementById("comfyui-waas-dropdown").style.paddingTop = '4px'
+      document.getElementById("comfyui-waas-dropdown").style.paddingBottom = '20px'
+    }
+
+    function hideDropdown() {
+      document.getElementById("comfyui-waas-dropdown").style.height = 0;
+      document.getElementById("comfyui-waas-dropdown").style.paddingTop = 0
+      document.getElementById("comfyui-waas-dropdown").style.paddingBottom = 0
+    }
+
+    function toggleDropdown() {
+      if (document.getElementById("comfyui-waas-dropdown").style.height === '90px') {
+        hideDropdown()
+      } else {
+        showDropdown()
+      }
+    }
+
+    // 点击页面其他地方隐藏下拉菜单
+    function handleDocumentClick(event) {
+      const dropdown = document.getElementById("comfyui-waas-dropdown");
+      const button = document.getElementById("comfyui-waas-btn");
+
+      // 检查点击是否在按钮或下拉菜单内部
+      const isClickInside = button.contains(event.target) ||
+        (dropdown && dropdown.contains(event.target));
+
+      // 如果点击在外部且下拉菜单是展开状态，则隐藏
+      if (!isClickInside && dropdown && dropdown.style.height === '90px') {
+        hideDropdown();
+      }
+    }
+
+    document.addEventListener('click', handleDocumentClick);
+
     const floatBtn = $el("div", {
       id: "comfyui-waas-btn",
-      style: {
-        position: "fixed",
-        bottom: "40px",
-        right: "40px",
-        width: "60px",
-        height: "60px",
-        background: "#4A90E2",
-        borderRadius: "50%",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        color: "white",
-        fontSize: "28px",
-        cursor: "pointer",
-        zIndex: 9999,
-        userSelect: "none",
-        boxShadow: "0 4px 10px rgba(0,0,0,0.3)",
-      },
-      onclick: () => {
-        // 👉 加判断：拖拽时不触发点击
-        if (isDragging) {
-          return;
+    }, [
+      $el("div", {
+        id: "comfyui-waas-logo",
+        onclick: () => {
+          // 👉 加判断：拖拽时不触发点击
+          if (isDragging) {
+            return;
+          }
+          toggleDropdown();
         }
-        browserDialog.show();
-      }
-    }, ["📚"]);
+      }),
+      $el("div", {
+        id: "comfyui-waas-dropdown",
+      }, [
+        $el("button", {
+          className: "comfyui-waas-dropdown-btn",
+          textContent: "云扉公模库",
+          onclick: () => {
+            browserDialog.show()
+            hideDropdown()
+          }
+        }),
+        $el("button", {
+          className: "comfyui-waas-dropdown-btn",
+          textContent: "云扉共享盘",
+          onclick: () => {
+            window.open("https://your-cloud-share-link.com", "_blank");
+            hideDropdown()
+          }
+        }),
+        $el("button", {
+          className: "comfyui-waas-dropdown-btn",
+          textContent: "刷新models",
+          onclick: async () => {
+            try {
+              const res = await api.fetchApi("/browser/models/refresh", {
+                method: "POST"
+              });
+              if (res.ok) {
+                showToast("Models刷新成功", () => { });
+              } else {
+                showToast("刷新失败，请重试", () => { });
+              }
+            } catch (error) {
+              showToast("刷新失败: " + error.message, () => { });
+            } finally {
+              hideDropdown()
+            }
+          }
+        })
+      ])
+    ]);
 
     document.body.appendChild(floatBtn);
 
