@@ -40,6 +40,14 @@
 	cursor: pointer;
 }
 
+.comfyui-waas-dropdown-btn:hover {
+	color: #0EA1FF !important;
+}
+
 iframe {
 	border: none;
+}
+
+.comfy-modal {
+	z-index: 1001;
 }

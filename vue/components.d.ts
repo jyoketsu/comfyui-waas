@@ -27,7 +27,4 @@ declare module 'vue' {
     TabNav: typeof import('./src/components/common/TabNav.vue')['default']
     Webview: typeof import('./src/components/common/Webview.vue')['default']
   }
-  export interface ComponentCustomProperties {
-    vLoading: typeof import('element-plus/es')['ElLoadingDirective']
-  }
 }

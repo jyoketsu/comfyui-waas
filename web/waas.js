@@ -30,7 +30,7 @@ class BrowserDialog extends ComfyDialog {
     const localConfig = getLocalConfig();
     let modalStyle = {
       width: "70%",
-      height: "80%",
+      height: "76%",
       maxWidth: "100%",
       maxHeight: "100%",
       minWidth: "24%",
@@ -125,14 +125,14 @@ class BrowserDialog extends ComfyDialog {
       e.style.left = '';
       e.style.top = '';
       e.style.transform = '';
-      e.style.height = '85%';
-      e.style.width = '80%';
+      e.style.height = '76%';
+      e.style.width = '70%';
     } else {
       e.style.left = '0px';
-      e.style.top = '0px';
+      e.style.top = '100px';
       e.style.transform = 'translate(-10px, -10px)';
-      e.style.height = '100%';
-      e.style.width = '32%';
+      e.style.height = 'calc(100% - 100px)';
+      e.style.width = '42%';
     }
 
     setLocalConfig('modalStyles', {
