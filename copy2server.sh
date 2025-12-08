@@ -11,6 +11,11 @@ REMOTE_HOST="2aada5fffb7b4bf8a0569d6a50409416.region2.waas.aigate.cc"
 REMOTE_PORT="45690"
 PASSWORD="d5b4558bb831408b9f68db044b5a1adb"
 
+# REMOTE_USER="root"
+# REMOTE_HOST="fb8cdabb52ef430da0ea1f1da63e07f1.k8s171.inner"
+# REMOTE_PORT="30093"
+# PASSWORD="489fd0b4c1a64b7794d13f7e2416d1bb"
+
 echo "开始部署..."
 
 # 创建临时目录用于打包

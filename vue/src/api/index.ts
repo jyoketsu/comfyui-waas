@@ -1,4 +1,5 @@
 import axios from "axios";
+import { ElMessage } from "element-plus";
 
 const token = import.meta.env.VITE_TOKEN;
 
@@ -78,13 +79,9 @@ export const request = {
 // 请求拦截器
 axios.interceptors.request.use(
   (config) => {
-    // 检查 URL 是否包含 `/api`
-    if (config.url && /\/api/.test(config.url)) {
-      
-      if (token) {
-        // 设置 Authorization 头部
-        config.headers["Authorization"] = `Bearer ${token}`;
-      }
+    if (token) {
+      // 设置 Authorization 头部
+      config.headers["Authorization"] = `Bearer ${token}`;
     }
     return config;
   },
@@ -98,11 +95,15 @@ axios.interceptors.response.use(
   (response) => response, // 请求成功直接返回
   async (error) => {
     console.log('error', error);
-
+    
+    ElMessage.error(error.response && error.response.data
+        ? error.response.data.msg
+        : error.message
+    );
     // 其他错误情况直接返回错误信息
     return Promise.reject(
       error.response && error.response.data
-        ? error.response.data.message
+        ? error.response.data.msg
         : error.message
     );
   }

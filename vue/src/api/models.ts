@@ -1,26 +1,29 @@
 import { request } from "@/api/index";
-const waasApiUrl = import.meta.env.VITE_WAAS_API_URL;
+const isDev = import.meta.env.DEV
 
-export function getModels(path: string) {
-  return request.get("/browser/proxy/admin/product/comfyuiModel/list", {
+export function getModels(path: string, name?: string) {
+  return request.get(isDev ? '/api/product/comfyuiModel/list' : "/browser/proxy/product/comfyuiModel/list", {
     path,
+    name,
   });
 }
 
-export function sync(username: string) {
+export function sync(rootPath: string, models: string[], dstPath: string) {
   return request.post("/browser/models/sync", {
-    username,
+    rootPath,
+    models,
+    dstPath,
   });
 }
 
-export function getInEffectiveModels(username: string) {
+export function getInEffectiveModels(rootPaths: string[]) {
   return request.post("/browser/models/ineffective", {
-    username,
+    rootPaths,
   });
 }
 
-export function clear(username: string) {
+export function clear(paths: string[]) {
   return request.post("/browser/models/clear", {
-    username,
+    paths,
   });
 }

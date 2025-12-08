@@ -16,6 +16,7 @@ declare module 'vue' {
     ElInput: typeof import('element-plus/es')['ElInput']
     ElPagination: typeof import('element-plus/es')['ElPagination']
     ElScrollbar: typeof import('element-plus/es')['ElScrollbar']
+    ElTooltip: typeof import('element-plus/es')['ElTooltip']
     Iconfont: typeof import('./src/components/common/Iconfont.vue')['default']
     ImageCropUploader: typeof import('./src/components/common/ImageCropUploader/index.vue')['default']
     MarkdownEditor: typeof import('./src/components/common/MarkdownEditor.vue')['default']
