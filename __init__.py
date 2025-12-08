@@ -18,6 +18,7 @@ from .routes import (
     files,
     downloads,
     xyz_plot as xyz_plot_routes,
+    proxy,
 )
 from .nodes import (
     select_inputs,
@@ -57,6 +58,7 @@ browser_app.add_routes(
         web.post("/models/ineffective", models.api_get_ineffective_models),
         web.post("/models/sync", models.api_sync_models),
         web.post("/models/clear", models.api_clear_models),
+        web.get("/proxy/{tail:.*}", proxy.api_proxy),
     ]
 )
 server.PromptServer.instance.app.add_subapp("/browser/", browser_app)

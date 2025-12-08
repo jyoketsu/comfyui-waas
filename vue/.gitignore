@@ -13,9 +13,6 @@
 app_build
 
 # Local env files
-.env
-.env.*
-!.env.example
 
 # misc
 .DS_Store

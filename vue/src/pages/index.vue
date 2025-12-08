@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import Iconfont from '@/components/common/Iconfont.vue';
 import { ElLoading, ElMessage } from 'element-plus';
-import { sync, getInEffectiveModels, clear } from '@/api/models';
-import { ref } from 'vue';
+import { sync, getInEffectiveModels, clear, getModels } from '@/api/models';
+import { ref, watch } from 'vue';
 
 const ineffectiveDialogVisible = ref(false);
 const loading = ref(false)
 const selectedMedia = ref<any[]>([])
+const paths = ref(['test']);
+const models = ref<any[]>([]);
 
 const handleSync = async () => {
 	const loading = ElLoading.service({
@@ -68,6 +70,24 @@ const selectAllInFolder = () => {
 const deselectAllInFolder = () => {
 	selectedMedia.value = []
 }
+
+const handleGetModels = async (path: string) => {
+	const res: any = await getModels(path)
+	selectedMedia.value = []
+	if (res.code === 0) {
+		models.value = res.data
+	}
+}
+
+const handleClickFolder = (item: any) => {
+	if (item.isDir) {
+		paths.value = [...paths.value, item.fileName]
+	}
+}
+
+watch(paths, (newVal) => {
+	handleGetModels(newVal.join('/'))
+}, { immediate: true })
 </script>
 
 <template>
@@ -101,12 +121,13 @@ const deselectAllInFolder = () => {
 			<div class="h-[30px] flex items-center">
 				<el-checkbox class="!mr-2" @click.stop=""
 					@change="(val: any) => val ? selectAllInFolder() : deselectAllInFolder()" />
-				<span>{{ `models/diffusion_models` }}</span>
+				<span>{{ `models/diffusion_models/${paths.join('/')}` }}</span>
 			</div>
 			<el-scrollbar class="flex-1">
 				<div class="flex flex-wrap py-2 gap-4">
 					<div v-for="item in 100" :key="item"
-						class="relative size-[144px] rounded-[10px] border border-[var(--el-border-color)] flex flex-col justify-center items-center overflow-hidden gap-2 cursor-pointer">
+						class="relative size-[144px] rounded-[10px] border border-[var(--el-border-color)] flex flex-col justify-center items-center overflow-hidden gap-2 cursor-pointer"
+						@click="handleClickFolder(item)">
 						<el-checkbox class="absolute top-2 left-2" :model-value="selectedMedia.includes(item)"
 							@click.stop="toggleMediaSelection(item)" />
 						<div class="size-10 bg-contain bg-center bg-no-repeat" :class="{ 'bg-[url(/icons/folder.png)]': true }" />
