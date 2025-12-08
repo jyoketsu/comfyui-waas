@@ -201,7 +201,7 @@ watch(paths, (newVal) => {
 							@click.stop="toggleMediaSelection(item.filePath)" />
 						<div class="size-10 bg-contain bg-center bg-no-repeat"
 							:class="{ 'bg-[url(/icons/folder.png)]': item.isDir, 'bg-[url(/icons/file.png)]': !item.isDir }" />
-						<el-tooltip :content="item.fileName" placement="bottom">
+						<el-tooltip :content="item.fileName" placement="bottom" :show-after="1000">
 							<p class="w-full truncate px-1 text-center">{{ item.fileName }}</p>
 						</el-tooltip>
 						<p class="w-full text-[12px] truncate px-1 text-center text-[var(--el-color-info)]">{{ item.createTime }}

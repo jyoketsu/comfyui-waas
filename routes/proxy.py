@@ -3,52 +3,88 @@ from aiohttp import web
 
 BASE_URL = "https://waas.cloudmind.cc/api"
 
+FORWARD_HEADER_WHITELIST = {
+    "authorization",
+    "accept",
+    "accept-language",
+    "content-type",
+    "user-agent",
+}
 
 async def api_proxy(request: web.Request):
-    tail_path = request.match_info.get("tail", "")
-    target_url = f"{BASE_URL}/{tail_path}"
-
+    tail = request.match_info.get("tail", "")
+    url = f"{BASE_URL}/{tail}"
     if request.query_string:
-        target_url += f"?{request.query_string}"
+        url += f"?{request.query_string}"
 
-    print("[Proxy] →", target_url)
+    print("[Proxy] >", request.method, url)
+
+    # 过滤 headers
+    in_headers = {k.lower(): v for k, v in request.headers.items()}
+    norm = {}
+    for k, v in in_headers.items():
+        if k not in FORWARD_HEADER_WHITELIST:
+            continue
+        if k == "authorization":
+            norm["Authorization"] = v
+        elif k == "content-type":
+            norm["Content-Type"] = v
+        elif k == "accept-language":
+            norm["Accept-Language"] = v
+        elif k == "user-agent":
+            norm["User-Agent"] = v
+        else:
+            norm[k] = v
 
     method = request.method
 
-    # Body（仅 JSON 有效）
+    # body 处理
     body = None
-    if method in ["POST", "PUT", "PATCH"]:
+    send_json = False
+    if method in ("POST", "PUT", "PATCH"):
         try:
             body = await request.json()
+            send_json = True
         except:
             body = await request.read()
+            send_json = False
 
-    # 原请求 headers
-    headers = dict(request.headers)
-    headers.pop("Host", None)
+    async with aiohttp.ClientSession(trust_env=False) as session:
+        try:
+            async with session.request(
+                method,
+                url,
+                headers=norm,
+                json=body if send_json else None,
+                data=None if send_json else body,
+                ssl=False,
+                timeout=aiohttp.ClientTimeout(total=30),
+            ) as resp:
 
-    async with aiohttp.ClientSession() as session:
-        async with session.request(
-            method,
-            target_url,
-            headers=headers,
-            json=body if isinstance(body, dict) else None,
-            data=body if isinstance(body, (bytes, str)) else None,
-            ssl=False,
-        ) as resp:
+                raw = await resp.read()
+                print("[Proxy] Response Status:", resp.status)
 
-            data = await resp.read()
+                out_headers = dict(resp.headers)
 
-            # 被代理服务器返回的 headers
-            resp_headers = dict(resp.headers)
+                # ❗ 必须移除，否则前端拿不到 body
+                out_headers.pop("Content-Encoding", None)
+                out_headers.pop("Transfer-Encoding", None)
+                out_headers.pop("Content-Length", None)
 
-            # 去掉 aiohttp 不允许的 header
-            resp_headers.pop("Content-Length", None)
+                # Content-Type 去掉 charset
+                ctype = resp.headers.get("Content-Type", "application/json")
+                ctype = ctype.split(";")[0]
+                out_headers["Content-Type"] = ctype
 
-            # ❗最关键：aiohttp 不允许 charset 出现在 content_type
-            # 所以不能用 content_type 参数，必须用 headers
+                return web.Response(
+                    status=resp.status,
+                    body=raw,
+                    headers=out_headers,
+                )
+
+        except Exception as e:
+            print("[Proxy] Exception:", repr(e))
             return web.Response(
-                status=resp.status,
-                body=data,
-                headers=resp_headers,
+                status=502,
+                text=f"proxy error: {repr(e)}"
             )
