@@ -42,45 +42,22 @@ const handleTest = async () => {
 		background: 'rgba(0, 0, 0, 0.5)',
 	})
 	try {
-		const data: any = {
-			"/home/waas/ComfyUI/models/": {
-				"details": [
-					{
-						"name": "controlnet",
-						"target_path": "/shared/models/controlnet-v1.1",
-					},
-					{
-						"name": "checkpoint.ckpt",
-						"target_path": "/mnt/storage/checkpoints/model_v1.ckpt",
-					}
-				]
-			},
-			"/root/comfyui/Comfyui/models/": {
-				"details": [
-					{
-						"name": "vae",
-						"target_path": "/mnt/storage/vae_models/sdxl-vae",
-					}
-				]
-			}
-		};
-
-		const keys = Object.keys(data);
-		for (let index = 0; index < keys.length; index++) {
-			const key = keys[index];
-			data[key].details.forEach((item: any) => {
-				ineffectiveModels.value.push({
-					path: key,
-					name: item.name,
-					targetPath: item.target_path,
-				})
-			})
-		}
-		ineffectiveDialogVisible.value = true
-
 		const res: any = await getInEffectiveModels(['/home/waas/ComfyUI/models/', '/root/comfyui/Comfyui/models/'])
-		if (res.data) {
+		const data = res.data;
+		const keys = Object.keys(data);
+		if (keys.length) {
 			ineffectiveDialogVisible.value = true
+
+			for (let index = 0; index < keys.length; index++) {
+				const key = keys[index];
+				data[key].details.forEach((item: any) => {
+					ineffectiveModels.value.push({
+						path: key,
+						name: item.name,
+						targetPath: item.target_path,
+					})
+				})
+			}
 		} else {
 			ElMessage.success('模型检测成功')
 		}
