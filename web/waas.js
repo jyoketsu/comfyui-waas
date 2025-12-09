@@ -1,6 +1,5 @@
 import { app } from "../../scripts/app.js";
 import { $el, ComfyDialog } from "../../scripts/ui.js";
-import { api } from "../../scripts/api.js";
 
 const browserUrl = "./browser/web/index.html";
 
@@ -280,27 +279,82 @@ app.registerExtension({
         $el("button", {
           className: "comfyui-waas-dropdown-btn",
           textContent: "云扉共享盘",
-          onclick: () => {
-            window.open("https://your-cloud-share-link.com", "_blank");
-            hideDropdown()
+          onclick: async (event) => {
+            try {
+              const res = await fetch(`/browser/models/envs`, {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  "envs": [
+                    "WAAS_ID",
+                    "CUDA_VERSION"
+                  ]
+                }),
+              });
+              if (!res.ok) {
+                throw new Error(`HTTP error! status: ${res.status}`);
+              }
+              const data = await res.json();
+              const waasId = data.data.WAAS_ID;
+              if (!waasId) {
+                throw new Error("WAAS_ID not found in response");
+              }
+
+              const response = await fetch(`/browser/proxy/openapi/instance/utilsByAgentId?agentId=${waasId}`, {
+                method: "GET",
+                headers: {
+                  "Authorization": "Bearer 104a29120af547aabc13fff4ebc3bdfc",
+                },
+              });
+              if (response.ok) {
+                const result = await response.json();
+                const apps = result.data;
+                const webos = apps.find(app => app.name === 'webos')
+                if (webos) {
+                  window.open(`https://${webos.host}`, "_blank");
+                } else {
+                  showToast("未找到webos应用", () => { });
+                }
+              }
+            } catch (error) {
+              showToast("获取共享盘失败", () => { });
+            } finally {
+              hideDropdown()
+            }
           }
         }),
         $el("button", {
           className: "comfyui-waas-dropdown-btn",
           textContent: "刷新models",
-          onclick: async () => {
+          onclick: async (event) => {
+            const btn = event.target;
+            btn.disabled = true;
+            btn.textContent = "刷新中...";
             try {
-              const res = await api.fetchApi("/browser/models/refresh", {
-                method: "POST"
+              const response = await fetch("/browser/models/refresh", {
+                method: "POST",
+                body: JSON.stringify({
+                  shellPath: "/etc/waas-script/refresh_models.sh",
+                  args: []
+                }),
               });
-              if (res.ok) {
-                showToast("Models刷新成功", () => { });
+              if (response.ok) {
+                const result = await response.json();
+                if (result.code === 200) {
+                  showToast("Models刷新成功", () => { });
+                } else {
+                  showToast("刷新失败，请重试", () => { });
+                }
               } else {
                 showToast("刷新失败，请重试", () => { });
               }
             } catch (error) {
               showToast("刷新失败: " + error.message, () => { });
             } finally {
+              btn.disabled = false;
+              btn.textContent = "刷新models";
               hideDropdown()
             }
           }
