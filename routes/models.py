@@ -4,6 +4,7 @@ from aiohttp import web
 from os import path
 import glob
 import shutil
+import subprocess
 
 
 def _collect_ineffective_symlinks(root_path: str) -> Dict[str, Any]:
@@ -220,3 +221,55 @@ async def api_sync_models(request: web.Request) -> web.Response:
             "message": "success",
         }
     )
+
+
+def _exec_shell(script_path: str, args: List[str] | None) -> bool:
+    if not isinstance(script_path, str) or not script_path:
+        return False
+    if args is not None and not isinstance(args, list):
+        return False
+
+    if not path.exists(script_path):
+        return False
+
+    # Invoke via bash to avoid executable-bit or shebang issues
+    bash = "/bin/bash" if path.exists("/bin/bash") else "bash"
+    cmd = [bash, script_path] + ([str(a) for a in args] if args else [])
+    try:
+        subprocess.run(
+            cmd,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            check=True,
+        )
+        return True
+    except Exception:
+        return False
+
+
+async def api_refresh_models(request: web.Request) -> web.Response:
+    try:
+        payload = await request.json()
+    except Exception:
+        return web.json_response(
+            {"code": 400, "data": {}, "message": "invalid request"}, status=400
+        )
+
+    script_path = payload.get("shellPath", "")
+    args = payload.get("args", None)
+
+    # Validate script exists before executing
+    if not script_path or not path.exists(script_path):
+        return web.json_response(
+            {"code": 400, "data": {}, "message": "shellPath not found"},
+            status=400,
+        )
+
+    success = _exec_shell(script_path, args)
+
+    if success:
+        return web.json_response({"code": 200, "data": {}, "message": "success"})
+    else:
+        return web.json_response(
+            {"code": 500, "data": {}, "message": "fail"}, status=500
+        )
