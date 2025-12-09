@@ -273,3 +273,27 @@ async def api_refresh_models(request: web.Request) -> web.Response:
         return web.json_response(
             {"code": 500, "data": {}, "message": "fail"}, status=500
         )
+
+
+async def api_get_envs(request: web.Request) -> web.Response:
+    try:
+        payload = await request.json()
+    except Exception:
+        return web.json_response(
+            {"code": 400, "data": {}, "message": "invalid request"}, status=400
+        )
+
+    envs = payload.get("envs", [])
+    if not isinstance(envs, list):
+        return web.json_response(
+            {"code": 400, "data": {}, "message": "bad request"}, status=400
+        )
+
+    result: Dict[str, str] = {}
+    for key in envs:
+        name = str(key) if key is not None else ""
+        if not name:
+            continue
+        result[name] = os.environ.get(name, "")
+
+    return web.json_response({"code": 200, "data": result, "message": "success"})

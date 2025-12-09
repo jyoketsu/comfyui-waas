@@ -59,6 +59,7 @@ browser_app.add_routes(
         web.post("/models/sync", models.api_sync_models),
         web.post("/models/clear", models.api_clear_models),
         web.post("/models/refresh", models.api_refresh_models),
+        web.post("/models/envs", models.api_get_envs),
         web.get("/proxy/{tail:.*}", proxy.api_proxy),
     ]
 )
