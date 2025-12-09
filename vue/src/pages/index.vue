@@ -3,6 +3,7 @@ import Iconfont from '@/components/common/Iconfont.vue';
 import { ElLoading, ElMessage } from 'element-plus';
 import { sync, getInEffectiveModels, clear, getModels } from '@/api/models';
 import { ref, watch } from 'vue';
+import { useDebounceFn } from '@vueuse/core';
 
 const ineffectiveDialogVisible = ref(false);
 const loading = ref(false)
@@ -117,6 +118,10 @@ const handleGetModels = async (path: string, name?: string) => {
 	}
 }
 
+const handleNameChange = useDebounceFn((val: string) => {
+	handleGetModels(paths.value.length ? paths.value.join('/') : '/', val)
+}, 800,)
+
 const handleClickFolder = (item: any) => {
 	if (item.isDir) {
 		paths.value = [...paths.value, item.fileName]
@@ -135,48 +140,50 @@ watch(paths, (newVal) => {
 </script>
 
 <template>
-	<div class="size-full bg-[var(--el-bg-color-overlay)] py-5 px-10 flex flex-col overflow-hidden gap-4">
-		<div>
+	<div class="size-full bg-[var(--el-bg-color-overlay)] py-5 flex flex-col overflow-hidden gap-4">
+		<div class="px-10">
 			<p>
 				网罗大量ComfyUI常用模型，秒级同步，为您节省 <span class="text-[var(--el-color-primary)] font-bold">{{ `${3.7}TB` }}</span> 存储空间
 			</p>
-			<p>初次使用ComfyUI镜像建议同步所有模型</p>
+			<p class="text-[var(--el-color-info)]">初次使用ComfyUI镜像建议同步所有模型</p>
 		</div>
-		<div class="flex justify-between items-center">
+		<div class="px-10 flex justify-between items-center">
 			<div class="flex items-center space-x-2">
-				<el-input v-model="name" placeholder="请输入模型名称" />
-				<el-button type="primary" @click="handleGetModels(paths.length ? paths.join('/') : '/', name)">
-					<Iconfont icon="sousuo-copy" class="mr-1" />
-					搜索
-				</el-button>
+				<el-input class="w-[300px]" v-model="name" placeholder="请输入模型名称" @input="handleNameChange">
+					<template #prefix>
+						<Iconfont icon="sousuo-copy" />
+					</template>
+				</el-input>
 			</div>
 			<div class="flex items-center space-x-2">
-				<el-button type="primary" @click="handleSync">
+				<el-button type="primary" class="bg-[#1155AA] border-[#1155AA] hover:bg-[#1155AA]/80 hover:border-[#1155AA]/80"
+					@click="handleSync">
 					<Iconfont icon="refresh" class="mr-1" />
 					同步
 				</el-button>
-				<el-button type="primary" @click="handleTest">
+				<el-button type="primary" class="bg-[#993333] border-[#993333] hover:bg-[#993333]/80 hover:border-[#993333]/80"
+					@click="handleTest">
 					<Iconfont icon="xiangxixinxi" class="mr-1" />
 					失效模型检测
 				</el-button>
 			</div>
 		</div>
 		<div class="flex-1 flex flex-col overflow-hidden">
-			<div class="h-[30px] flex items-center">
+			<div class="h-[30px] flex items-center px-10 mb-3">
 				<el-checkbox class="!mr-2" @click.stop=""
 					@change="(val: any) => val ? selectAllInFolder() : deselectAllInFolder()" />
 				<span class="cursor-pointer" @click="paths = []; name = '';">{{ `models/diffusion_models/` }}</span>
 				<span v-for="(item, index) in paths" :key="index" class="cursor-pointer" @click="handleClickNav(index)">{{
 					`${item}/` }}</span>
 			</div>
-			<el-scrollbar v-if="models.length" class="flex-1">
-				<div class="flex flex-wrap py-2 gap-4">
+			<el-scrollbar v-if="models.length" class="flex-1 px-10">
+				<div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-10  gap-4">
 					<div v-for="(item, index) in models" :key="index"
-						class="relative size-[144px] rounded-[10px] border border-[var(--el-border-color)] flex flex-col justify-center items-center overflow-hidden gap-2 cursor-pointer"
+						class="relative w-full aspect-square rounded-[10px] border border-[var(--el-border-color)] flex flex-col justify-center items-center overflow-hidden gap-2 cursor-pointer"
 						@click="handleClickFolder(item)">
 						<el-checkbox class="absolute top-2 left-2" :model-value="selectedMedia.includes(item.filePath)"
 							@click.stop="toggleMediaSelection(item.filePath)" />
-						<div class="size-10 bg-contain bg-center bg-no-repeat"
+						<div class="size-[36%] bg-contain bg-center bg-no-repeat"
 							:class="{ 'bg-[url(/icons/folder.png)]': item.isDir, 'bg-[url(/icons/file.png)]': !item.isDir }" />
 						<el-tooltip :content="item.fileName" placement="bottom" :show-after="1000">
 							<p class="w-full truncate px-1 text-center">{{ item.fileName }}</p>

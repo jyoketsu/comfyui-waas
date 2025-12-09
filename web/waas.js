@@ -313,7 +313,7 @@ app.registerExtension({
                 const apps = result.data;
                 const webos = apps.find(app => app.name === 'webos')
                 if (webos) {
-                  window.open(`https://${webos.host}`, "_blank");
+                  window.open(`https://${webos.host}?toLoginUser=root&toLoginPassword=${webos.password}`, "_blank");
                 } else {
                   showToast("未找到webos应用", () => { });
                 }
