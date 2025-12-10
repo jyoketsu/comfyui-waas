@@ -44,7 +44,7 @@ async def api_get_ineffective_models(request: web.Request) -> web.Response:
     except Exception:
         payload = {}
 
-    root_paths: List[str] = payload.get("root_paths", [])
+    root_paths: List[str] = payload.get("rootPaths", [])
 
     data: Dict[str, Any] = {}
     for root in root_paths:
@@ -183,7 +183,7 @@ async def api_sync_models(request: web.Request) -> web.Response:
     except Exception:
         return web.json_response({"code": 400, "message": "invalid json"}, status=400)
 
-    model_root = payload.get("modelRootPath", "")
+    model_root = payload.get("rootPath", "")
     models = payload.get("models", [])
     dst_path = payload.get("dstPath", "")
 
@@ -192,7 +192,7 @@ async def api_sync_models(request: web.Request) -> web.Response:
 
     if not path.exists(model_root) or not path.isdir(model_root):
         return web.json_response(
-            {"code": 400, "message": "modelRootPath must be an existing directory"},
+            {"code": 400, "message": "rootPath must be an existing directory"},
             status=400,
         )
 
