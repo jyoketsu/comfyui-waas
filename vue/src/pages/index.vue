@@ -16,6 +16,7 @@ const ineffectiveModels = ref<{
 	targetPath: string;
 }[]>([])
 const name = ref('');
+const isSelectAll = ref(false)
 
 const handleSync = async () => {
 	if (!selectedMedia.value.length) {
@@ -28,7 +29,8 @@ const handleSync = async () => {
 		background: 'rgba(0, 0, 0, 0.5)',
 	})
 	try {
-		await sync('/datasets/ComfyUI/models', selectedMedia.value, '/home/waas/ComfyUI/models')
+		// todo 生成环境dataset改为datasets
+		await sync(`/dataset/ComfyUI/models`, selectedMedia.value, '/home/waas/ComfyUI/models')
 		ElMessage.success('模型同步成功')
 	} catch (error) {
 	} finally {
@@ -88,16 +90,24 @@ const toggleMediaSelection = (id: any) => {
 	} else {
 		selectedMedia.value.push(id)
 	}
+	if (selectedMedia.value.length === models.value.length) {
+		isSelectAll.value = true
+	} else {
+		isSelectAll.value = false
+	}
 }
 
 const selectAllInFolder = () => {
 	models.value.forEach(item => {
-		toggleMediaSelection(item.filePath)
+		// toggleMediaSelection(item.filePath)
+		selectedMedia.value.push(item.filePath)
 	})
+	isSelectAll.value = true;
 }
 
 const deselectAllInFolder = () => {
-	selectedMedia.value = []
+	selectedMedia.value = [];
+	isSelectAll.value = false;
 }
 
 const handleGetModels = async (path: string, name?: string) => {
@@ -109,6 +119,7 @@ const handleGetModels = async (path: string, name?: string) => {
 	try {
 		const res: any = await getModels(path, name)
 		selectedMedia.value = []
+		isSelectAll.value = false
 		if (res.code === 0) {
 			models.value = res.data
 		}
@@ -143,7 +154,7 @@ watch(paths, (newVal) => {
 	<div class="size-full bg-[var(--el-bg-color-overlay)] py-5 flex flex-col overflow-hidden gap-4">
 		<div class="px-10">
 			<p>
-				网罗大量ComfyUI常用模型，秒级同步，为您节省 <span class="text-[var(--el-color-primary)] font-bold">{{ `${3.7}TB` }}</span> 存储空间
+				网罗大量ComfyUI常用模型，秒级同步，为您节省 <span class="text-[var(--el-color-primary)] font-bold">{{ `${3.9}TB` }}</span> 存储空间
 			</p>
 			<p class="text-[var(--el-color-info)]">初次使用ComfyUI镜像建议同步所有模型</p>
 		</div>
@@ -161,16 +172,18 @@ watch(paths, (newVal) => {
 					<Iconfont icon="refresh" class="mr-1" />
 					同步
 				</el-button>
-				<el-button type="primary" class="bg-[#993333] border-[#993333] hover:bg-[#993333]/80 hover:border-[#993333]/80"
-					@click="handleTest">
-					<Iconfont icon="xiangxixinxi" class="mr-1" />
-					失效模型检测
-				</el-button>
+				<el-tooltip content="云扉公模库会清理老旧模型，请定时检测，以防给您带来不必要的麻烦" placement="top">
+					<el-button type="primary"
+						class="bg-[#993333] border-[#993333] hover:bg-[#993333]/80 hover:border-[#993333]/80" @click="handleTest">
+						<Iconfont icon="xiangxixinxi" class="mr-1" />
+						失效模型检测
+					</el-button>
+				</el-tooltip>
 			</div>
 		</div>
 		<div class="flex-1 flex flex-col overflow-hidden">
 			<div class="h-[30px] flex items-center px-10 mb-3">
-				<el-checkbox class="!mr-2" @click.stop=""
+				<el-checkbox class="!mr-2" v-model="isSelectAll" @click.stop=""
 					@change="(val: any) => val ? selectAllInFolder() : deselectAllInFolder()" />
 				<span class="cursor-pointer" @click="paths = []; name = '';">{{ `models/diffusion_models/` }}</span>
 				<span v-for="(item, index) in paths" :key="index" class="cursor-pointer" @click="handleClickNav(index)">{{

@@ -216,7 +216,7 @@ app.registerExtension({
     var isDragging = false;
 
     function showDropdown() {
-      document.getElementById("comfyui-waas-dropdown").style.height = '90px';
+      document.getElementById("comfyui-waas-dropdown").style.height = '112px';
       document.getElementById("comfyui-waas-dropdown").style.paddingTop = '4px'
       document.getElementById("comfyui-waas-dropdown").style.paddingBottom = '20px'
     }
@@ -250,7 +250,120 @@ app.registerExtension({
       }
     }
 
-    document.addEventListener('click', handleDocumentClick);
+    // document.addEventListener('click', handleDocumentClick);
+
+    const btn1 = $el("button", {
+      className: "comfyui-waas-dropdown-btn",
+      textContent: "云扉公模库",
+      title: "收入大量常用模型，可自主选择同步",
+      onclick: () => {
+        browserDialog.show()
+        hideDropdown()
+      }
+    });
+
+    const btn2 = $el("button", {
+      className: "comfyui-waas-dropdown-btn",
+      textContent: "云扉共享盘",
+      title: "通过云扉OS使用，可快速分享私有模型，对方无需下载",
+      onclick: async (event) => {
+        try {
+          const res = await fetch(`/browser/models/envs`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              "envs": [
+                "WAAS_ID",
+                "CUDA_VERSION"
+              ]
+            }),
+          });
+          if (!res.ok) {
+            throw new Error(`HTTP error! status: ${res.status}`);
+          }
+          const data = await res.json();
+          const waasId = data.data.WAAS_ID;
+          if (!waasId) {
+            throw new Error("WAAS_ID not found in response");
+          }
+
+          const response = await fetch(`/browser/proxy/openapi/instance/utilsByAgentId?agentId=${waasId}`, {
+            method: "GET",
+            headers: {
+              "Authorization": "Bearer 104a29120af547aabc13fff4ebc3bdfc",
+            },
+          });
+          if (response.ok) {
+            const result = await response.json();
+            const apps = result.data;
+            const webos = apps.find(app => app.name === 'webos')
+            if (webos) {
+              window.open(`https://${webos.host}?toLoginUser=root&toLoginPassword=${webos.password}`, "_blank");
+            } else {
+              showToast("未找到webos应用", () => { });
+            }
+          }
+        } catch (error) {
+          showToast("获取共享盘失败", () => { });
+        } finally {
+          hideDropdown()
+        }
+      }
+    });
+
+    const btn3 = $el("button", {
+      className: "comfyui-waas-dropdown-btn",
+      textContent: "刷新models",
+      title: "自主下载/上传模型后，comfyui内找不到模型时，点此按钮",
+      onclick: async (event) => {
+        const btn = event.target;
+        btn.disabled = true;
+        btn.textContent = "刷新中...";
+        try {
+          const response = await fetch("/browser/models/refresh", {
+            method: "POST",
+            body: JSON.stringify({
+              shellPath: "/etc/waas-script/refresh_models.sh",
+              args: []
+            }),
+          });
+          if (response.ok) {
+            const result = await response.json();
+            if (result.code === 200) {
+              showToast("Models刷新成功", () => { });
+            } else {
+              showToast("刷新失败，请重试", () => { });
+            }
+          } else {
+            showToast("刷新失败，请重试", () => { });
+          }
+        } catch (error) {
+          showToast("刷新失败: " + error.message, () => { });
+        } finally {
+          btn.disabled = false;
+          btn.textContent = "刷新models";
+          hideDropdown()
+        }
+      }
+    });
+
+    const tip = $el("div", {
+      className: "comfyui-waas-tip",
+      textContent: "初次使用ComfyUI镜像建议同步所有模型"
+    }, [
+      $el("button", {
+        textContent: "关闭",
+        onclick: () => {
+          // 关闭comfyui-waas-tip
+          const tip = document.querySelector('.comfyui-waas-tip');
+          if (tip) {
+            tip.remove();
+          }
+        }
+      } 
+    ]);
 
     const floatBtn = $el("div", {
       id: "comfyui-waas-btn",
@@ -264,99 +377,18 @@ app.registerExtension({
           }
           toggleDropdown();
         }
-      }),
+      }, [tip]),
       $el("div", {
         id: "comfyui-waas-dropdown",
       }, [
+        btn1,
+        btn2,
+        btn3,
         $el("button", {
           className: "comfyui-waas-dropdown-btn",
-          textContent: "云扉公模库",
-          onclick: () => {
-            browserDialog.show()
+          textContent: "收起",
+          onclick: (event) => {
             hideDropdown()
-          }
-        }),
-        $el("button", {
-          className: "comfyui-waas-dropdown-btn",
-          textContent: "云扉共享盘",
-          onclick: async (event) => {
-            try {
-              const res = await fetch(`/browser/models/envs`, {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                  "envs": [
-                    "WAAS_ID",
-                    "CUDA_VERSION"
-                  ]
-                }),
-              });
-              if (!res.ok) {
-                throw new Error(`HTTP error! status: ${res.status}`);
-              }
-              const data = await res.json();
-              const waasId = data.data.WAAS_ID;
-              if (!waasId) {
-                throw new Error("WAAS_ID not found in response");
-              }
-
-              const response = await fetch(`/browser/proxy/openapi/instance/utilsByAgentId?agentId=${waasId}`, {
-                method: "GET",
-                headers: {
-                  "Authorization": "Bearer 104a29120af547aabc13fff4ebc3bdfc",
-                },
-              });
-              if (response.ok) {
-                const result = await response.json();
-                const apps = result.data;
-                const webos = apps.find(app => app.name === 'webos')
-                if (webos) {
-                  window.open(`https://${webos.host}?toLoginUser=root&toLoginPassword=${webos.password}`, "_blank");
-                } else {
-                  showToast("未找到webos应用", () => { });
-                }
-              }
-            } catch (error) {
-              showToast("获取共享盘失败", () => { });
-            } finally {
-              hideDropdown()
-            }
-          }
-        }),
-        $el("button", {
-          className: "comfyui-waas-dropdown-btn",
-          textContent: "刷新models",
-          onclick: async (event) => {
-            const btn = event.target;
-            btn.disabled = true;
-            btn.textContent = "刷新中...";
-            try {
-              const response = await fetch("/browser/models/refresh", {
-                method: "POST",
-                body: JSON.stringify({
-                  shellPath: "/etc/waas-script/refresh_models.sh",
-                  args: []
-                }),
-              });
-              if (response.ok) {
-                const result = await response.json();
-                if (result.code === 200) {
-                  showToast("Models刷新成功", () => { });
-                } else {
-                  showToast("刷新失败，请重试", () => { });
-                }
-              } else {
-                showToast("刷新失败，请重试", () => { });
-              }
-            } catch (error) {
-              showToast("刷新失败: " + error.message, () => { });
-            } finally {
-              btn.disabled = false;
-              btn.textContent = "刷新models";
-              hideDropdown()
-            }
           }
         })
       ])
