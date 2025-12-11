@@ -4,5 +4,3 @@ collections/
 sources/
 .DS_Store
 download_logs/
-web/dist
-web/build
