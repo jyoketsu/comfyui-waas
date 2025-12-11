@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import Iconfont from '@/components/common/Iconfont.vue';
 import { ElLoading, ElMessage } from 'element-plus';
-import { sync, getInEffectiveModels, clear, getModels } from '@/api/models';
+import { sync, getInEffectiveModels, clear, getModels, searchModels } from '@/api/models';
 import { ref, watch } from 'vue';
 import { useDebounceFn } from '@vueuse/core';
 
@@ -121,7 +121,7 @@ const handleGetModels = async (path: string, name?: string) => {
 		background: 'rgba(0, 0, 0, 0.5)',
 	})
 	try {
-		const res: any = await getModels(path, name)
+		const res: any = name ? await searchModels(name) : await getModels(path)
 		selectedMedia.value = []
 		isSelectAll.value = false
 		if (res.code === 0) {
@@ -189,9 +189,10 @@ watch(paths, (newVal) => {
 			<div class="h-[30px] flex items-center px-10 mb-3">
 				<el-checkbox class="!mr-2" v-model="isSelectAll" @click.stop=""
 					@change="(val: any) => val ? selectAllInFolder() : deselectAllInFolder()" />
-				<span class="cursor-pointer" @click="paths = []; name = '';">{{ `models/diffusion_models/` }}</span>
-				<span v-for="(item, index) in paths" :key="index" class="cursor-pointer" @click="handleClickNav(index)">{{
-					`${item}/` }}</span>
+				<span class="cursor-pointer" @click="paths = []; name = '';">{{ name?'搜索结果：':'models/' }}</span>
+				<span v-if="!name" v-for="(item, index) in paths" :key="index" class="cursor-pointer"
+					@click="handleClickNav(index)">{{
+						`${item}/` }}</span>
 			</div>
 			<el-scrollbar v-if="models.length" class="flex-1 px-10">
 				<div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-10  gap-4">

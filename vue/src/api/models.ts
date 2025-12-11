@@ -8,6 +8,12 @@ export function getModels(path: string, name?: string) {
   });
 }
 
+export function searchModels(name: string) {
+  return request.get(isDev ? '/api/product/comfyuiModel/search' : "/browser/proxy/product/comfyuiModel/search", {
+    name,
+  });
+}
+
 export function sync(rootPath: string, models: string[], dstPath: string) {
   return request.post("/browser/models/sync", {
     rootPath,

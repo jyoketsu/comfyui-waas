@@ -6,10 +6,15 @@ SRC_DIR="/home/workspace/yizhi/comfyui-waas"
 # 目标服务器信息
 REMOTE_PATH="~/comfyui/ComfyUI/custom_nodes"
 
+# REMOTE_USER="root"
+# REMOTE_HOST="ce1c098b37c147c3a5c80f35eb430f81.k8s171.inner"
+# REMOTE_PORT="30149"
+# PASSWORD="a8948667805f4a46ad08a84b1bcf44b7"
+
 REMOTE_USER="root"
-REMOTE_HOST="ce1c098b37c147c3a5c80f35eb430f81.k8s171.inner"
-REMOTE_PORT="30149"
-PASSWORD="a8948667805f4a46ad08a84b1bcf44b7"
+REMOTE_HOST="d83cb6bf8c5f464c9635647e62f65c4b.k8s171.inner"
+REMOTE_PORT="30128"
+PASSWORD="b39b988f3561446c9d8115d7310ea1f8"
 
 echo "开始部署..."
 

@@ -1,7 +1,7 @@
 #comfyui-waas-btn {
 	position: fixed;
-	top: 115px;
-	left: 70px;
+	top: 155px;
+	left: 80px;
 	width: 80px;
 	border-radius: 40px;
 	cursor: pointer;
@@ -26,8 +26,8 @@
 
 .comfyui-waas-tip {
 	position: absolute;
-	left: -76px;
-	top: -120px;
+	left: -66px;
+	top: -105px;
 	width: 230px;
 	padding: 28px 18px;
 	font-size: 18px;
@@ -36,6 +36,7 @@
 	z-index: 999999;
 	color: #FFFFFF;
 	border-radius: 5px;
+	font-size: 12px;
 }
 
 .comfyui-waas-tip>button {
@@ -45,20 +46,23 @@
 }
 
 #comfyui-waas-dropdown {
-	height: 112px;
 	width: 80px;
 	overflow: hidden;
 	transition: height 0.3s ease-in-out;
+	border-radius: 0 0 40px 40px;
 }
 
 .comfyui-waas-dropdown-btn {
-	height: 22px;
-	font-size: 12px;
+	height: 30px;
+	font-size: 13px;
 	background-color: #363636 !important;
 	color: #FFF !important;
-	border: none;
 	width: 100%;
 	cursor: pointer;
+	border-bottom: 1px solid #727272;
+	border-top: none;
+	border-left: none;
+	border-right: none;
 }
 
 .comfyui-waas-dropdown-btn:hover {

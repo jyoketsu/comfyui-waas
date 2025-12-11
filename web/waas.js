@@ -216,7 +216,7 @@ app.registerExtension({
     var isDragging = false;
 
     function showDropdown() {
-      document.getElementById("comfyui-waas-dropdown").style.height = '112px';
+      document.getElementById("comfyui-waas-dropdown").style.height = '142px';
       document.getElementById("comfyui-waas-dropdown").style.paddingTop = '4px'
       document.getElementById("comfyui-waas-dropdown").style.paddingBottom = '20px'
     }
@@ -228,7 +228,7 @@ app.registerExtension({
     }
 
     function toggleDropdown() {
-      if (document.getElementById("comfyui-waas-dropdown").style.height === '112px') {
+      if (document.getElementById("comfyui-waas-dropdown").style.height === '142px') {
         hideDropdown()
       } else {
         showDropdown()
@@ -320,6 +320,9 @@ app.registerExtension({
             const result = await response.json();
             if (result.code === 200) {
               showToast("Models刷新成功", () => { });
+              setTimeout(() => {
+                window.location.reload();
+              }, 500);
             } else {
               showToast("刷新失败，请重试", () => { });
             }
@@ -339,7 +342,7 @@ app.registerExtension({
     const tip = $el("div", {
       className: "comfyui-waas-tip",
     }, [
-      "初次使用ComfyUI镜像建议同步所有模型",
+      "初次使用ComfyUI镜像建议同步云扉公模库所有模型",
       $el("button", {
         textContent: "关闭",
         onclick: (event) => {
@@ -383,6 +386,8 @@ app.registerExtension({
     ]);
 
     document.body.appendChild(floatBtn);
+
+    showDropdown();
 
     // Drag logic
     (function enableDrag() {
