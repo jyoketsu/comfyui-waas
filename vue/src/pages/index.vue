@@ -156,11 +156,11 @@ watch(paths, (newVal) => {
 
 <template>
 	<div class="size-full bg-[var(--el-bg-color-overlay)] py-5 flex flex-col overflow-hidden gap-4">
-		<div class="px-10">
+		<div class="px-10 space-y-2">
 			<p>
 				网罗大量ComfyUI常用模型，秒级同步，为您节省 <span class="text-[var(--el-color-primary)] font-bold">{{ `${3.9}TB` }}</span> 存储空间
 			</p>
-			<p class="text-[var(--el-color-info)]">初次使用ComfyUI镜像建议同步所有模型</p>
+			<p>初次使用ComfyUI镜像建议同步所有模型</p>
 		</div>
 		<div class="px-10 flex justify-between items-center">
 			<div class="flex items-center space-x-2">
@@ -189,7 +189,7 @@ watch(paths, (newVal) => {
 			<div class="h-[30px] flex items-center px-10 mb-3">
 				<el-checkbox class="!mr-2" v-model="isSelectAll" @click.stop=""
 					@change="(val: any) => val ? selectAllInFolder() : deselectAllInFolder()" />
-				<span class="cursor-pointer" @click="paths = []; name = '';">{{ name?'搜索结果：':'models/' }}</span>
+				<span class="cursor-pointer" @click="paths = []; name = '';">{{ name ? '搜索结果：' : 'models/' }}</span>
 				<span v-if="!name" v-for="(item, index) in paths" :key="index" class="cursor-pointer"
 					@click="handleClickNav(index)">{{
 						`${item}/` }}</span>
