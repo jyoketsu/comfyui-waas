@@ -26,10 +26,10 @@
 
 .comfyui-waas-tip {
 	position: absolute;
-	left: -46px;
-	top: -100px;
+	left: -76px;
+	top: -120px;
 	width: 230px;
-	padding: 28px;
+	padding: 28px 18px;
 	font-size: 18px;
 	background-color: #363636;
 	box-shadow: 0 0 10px #888;
@@ -40,8 +40,8 @@
 
 .comfyui-waas-tip>button {
 	position: absolute;
-	top: 8px;
-	right: 8px;
+	top: 2px;
+	right: 2px;
 }
 
 #comfyui-waas-dropdown {

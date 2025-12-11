@@ -228,29 +228,12 @@ app.registerExtension({
     }
 
     function toggleDropdown() {
-      if (document.getElementById("comfyui-waas-dropdown").style.height === '90px') {
+      if (document.getElementById("comfyui-waas-dropdown").style.height === '112px') {
         hideDropdown()
       } else {
         showDropdown()
       }
     }
-
-    // 点击页面其他地方隐藏下拉菜单
-    function handleDocumentClick(event) {
-      const dropdown = document.getElementById("comfyui-waas-dropdown");
-      const button = document.getElementById("comfyui-waas-btn");
-
-      // 检查点击是否在按钮或下拉菜单内部
-      const isClickInside = button.contains(event.target) ||
-        (dropdown && dropdown.contains(event.target));
-
-      // 如果点击在外部且下拉菜单是展开状态，则隐藏
-      if (!isClickInside && dropdown && dropdown.style.height === '90px') {
-        hideDropdown();
-      }
-    }
-
-    // document.addEventListener('click', handleDocumentClick);
 
     const btn1 = $el("button", {
       className: "comfyui-waas-dropdown-btn",
@@ -351,18 +334,19 @@ app.registerExtension({
 
     const tip = $el("div", {
       className: "comfyui-waas-tip",
-      textContent: "初次使用ComfyUI镜像建议同步所有模型"
     }, [
+      "初次使用ComfyUI镜像建议同步所有模型",
       $el("button", {
         textContent: "关闭",
-        onclick: () => {
+        onclick: (event) => {
+          event.stopPropagation();
           // 关闭comfyui-waas-tip
           const tip = document.querySelector('.comfyui-waas-tip');
           if (tip) {
             tip.remove();
           }
         }
-      } 
+      })
     ]);
 
     const floatBtn = $el("div", {
