@@ -1,7 +1,9 @@
 import aiohttp
 from aiohttp import web
 
-BASE_URL = "https://waas.cloudmind.cc/api"
+# todo生产
+# BASE_URL = "https://waas.cloudmind.cc/api"
+BASE_URL = "https://waas.aigate.cc/api"
 
 FORWARD_HEADER_WHITELIST = {
     "authorization",

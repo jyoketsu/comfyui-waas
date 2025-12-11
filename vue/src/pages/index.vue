@@ -29,8 +29,11 @@ const handleSync = async () => {
 		background: 'rgba(0, 0, 0, 0.5)',
 	})
 	try {
-		// todo 生成环境dataset改为datasets
+		// todo生产
+		// 测试
 		await sync(`/dataset/ComfyUI/models`, selectedMedia.value, '/home/waas/ComfyUI/models')
+		// 生产
+		// await sync(`/datasets/ComfyUI/models`, selectedMedia.value, '/home/waas/ComfyUI/models')
 		ElMessage.success('模型同步成功')
 	} catch (error) {
 	} finally {
@@ -45,6 +48,7 @@ const handleTest = async () => {
 		background: 'rgba(0, 0, 0, 0.5)',
 	})
 	try {
+		ineffectiveModels.value = [];
 		const res: any = await getInEffectiveModels(['/home/waas/ComfyUI/models/', '/root/comfyui/Comfyui/models/'])
 		const data = res.data;
 		const keys = Object.keys(data);
