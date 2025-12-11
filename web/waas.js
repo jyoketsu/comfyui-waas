@@ -277,9 +277,9 @@ app.registerExtension({
             headers: {
               // todo生产token
               // 测试
-              "Authorization": "Bearer 104a29120af547aabc13fff4ebc3bdfc",
+              // "Authorization": "Bearer 104a29120af547aabc13fff4ebc3bdfc",
               // 生产
-              // "Authorization": "Bearer b1e731f0b34f4e5fb0c4a302111c442b",
+              "Authorization": "Bearer b1e731f0b34f4e5fb0c4a302111c442b",
             },
           });
           if (response.ok) {

@@ -31,9 +31,9 @@ const handleSync = async () => {
 	try {
 		// todo生产
 		// 测试
-		await sync(`/dataset/ComfyUI/models`, selectedMedia.value, '/home/waas/ComfyUI/models')
+		// await sync(`/dataset/ComfyUI/models`, selectedMedia.value, '/home/waas/ComfyUI/models')
 		// 生产
-		// await sync(`/datasets/ComfyUI/models`, selectedMedia.value, '/home/waas/ComfyUI/models')
+		await sync(`/datasets/ComfyUI/models`, selectedMedia.value, '/home/waas/ComfyUI/models')
 		ElMessage.success('模型同步成功')
 	} catch (error) {
 	} finally {
