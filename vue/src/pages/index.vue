@@ -52,9 +52,8 @@ const handleTest = async () => {
 		const res: any = await getInEffectiveModels(['/home/waas/ComfyUI/models/', '/root/comfyui/Comfyui/models/'])
 		const data = res.data;
 		const keys = Object.keys(data);
+		ineffectiveDialogVisible.value = true
 		if (keys.length) {
-			ineffectiveDialogVisible.value = true
-
 			for (let index = 0; index < keys.length; index++) {
 				const key = keys[index];
 				data[key].details.forEach((item: any) => {
@@ -65,8 +64,6 @@ const handleTest = async () => {
 					})
 				})
 			}
-		} else {
-			ElMessage.success('模型检测成功')
 		}
 	} catch (error) {
 	} finally {
@@ -214,23 +211,29 @@ watch(paths, (newVal) => {
 			<div v-else class="flex-1 w-full flex justify-center items-center text-[var(--el-color-info)]">暂无内容</div>
 		</div>
 	</div>
-	<el-dialog v-model="ineffectiveDialogVisible" title="以下模型地址已失效" width="500">
+	<el-dialog v-model="ineffectiveDialogVisible" :title="ineffectiveModels.length ? '以下模型地址已失效' : '无失效模型'" width="500">
 		<div class="flex flex-col gap-1 max-h-[300px] overflow-hidden">
 			<p class="text-[var(--el-color-info)]">经常清理失效模型，有助于节省存储用量</p>
-			<p>{{ `数据盘：${`/datasets/ComfyUI/models`}` }}</p>
+			<p>{{ `校验路径：${`/home/waas/ComfyUI/models`}` }}</p>
 			<div class="space-y-1 flex-1 overflow-auto my-3">
-				<div v-for="(item, index) in ineffectiveModels" :key="index"
+				<div v-if="ineffectiveModels.length" v-for="(item, index) in ineffectiveModels" :key="index"
 					class="w-full overflow-hidden flex items-center justify-between">
 					<span class="truncate">{{ item.targetPath }}</span>
 					<span class="text-[var(--el-color-info)] text-[12px]">{{ `` }}</span>
+				</div>
+				<div v-else>
+					无失效模型
 				</div>
 			</div>
 		</div>
 		<template #footer>
 			<div class="dialog-footer">
-				<el-button @click="ineffectiveDialogVisible = false">取消</el-button>
-				<el-button :loading="loading" type="primary" @click="handleClear">
+				<el-button v-if="ineffectiveModels.length" @click="ineffectiveDialogVisible = false">取消</el-button>
+				<el-button v-if="ineffectiveModels.length" :loading="loading" type="primary" @click="handleClear">
 					确认清除
+				</el-button>
+				<el-button v-else type="primary" @click="ineffectiveDialogVisible = false">
+					关闭
 				</el-button>
 			</div>
 		</template>

@@ -339,10 +339,17 @@ app.registerExtension({
       }
     });
 
+    const docLink = $el("a", {
+      href: "https://docs.aigate.cc/bestPractice/aigatePlugin.html",
+      target: "_blank",
+      textContent: "详情查看文档",
+    });
+
     const tip = $el("div", {
       className: "comfyui-waas-tip",
     }, [
-      "初次使用ComfyUI镜像建议同步云扉公模库所有模型",
+      "初次使用ComfyUI镜像建议同步云扉公模库所有模型，",
+      docLink,
       $el("button", {
         textContent: "关闭",
         onclick: (event) => {
