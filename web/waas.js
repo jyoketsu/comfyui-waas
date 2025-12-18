@@ -289,7 +289,7 @@ app.registerExtension({
             if (webos) {
               window.open(`https://${webos.host}?toLoginUser=root&toLoginPassword=${webos.password}`, "_blank");
             } else {
-              showToast("未找到webos应用", () => { });
+              showToast("创作者已禁用云扉OS", () => { });
             }
           }
         } catch (error) {
@@ -319,9 +319,14 @@ app.registerExtension({
           if (response.ok) {
             const result = await response.json();
             if (result.code === 200) {
-              showToast("Models刷新成功", () => { });
-              setTimeout(() => {
-                window.location.reload();
+              setTimeout(async () => {
+                try {
+                  await app.refreshComboInNodes();
+                  showToast("Models刷新成功", () => { });
+                } catch (error) {
+                  console.warn("刷新节点选项失败:", error);
+                  showToast("Models刷新成功（部分节点可能需要手动刷新）", () => { });
+                }
               }, 500);
             } else {
               showToast("刷新失败，请重试", () => { });
