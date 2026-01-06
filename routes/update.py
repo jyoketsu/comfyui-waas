@@ -1,11 +1,12 @@
 import subprocess
+import os
 import aiohttp
 from aiohttp import web
 
 
 async def api_check_update(request: web.Request) -> web.Response:
     try:
-        plugin_dir = "~/comfyui/ComfyUI/custom_nodes/comfyui-waas"
+        plugin_dir = os.path.expanduser("~/comfyui/ComfyUI/custom_nodes/comfyui-waas")
 
         # Get local commit hash
         local_hash_result = subprocess.run(
@@ -68,7 +69,7 @@ async def api_check_update(request: web.Request) -> web.Response:
 async def api_update_plugin(request: web.Request) -> web.Response:
     try:
         # Change to the plugin directory
-        plugin_dir = "~/comfyui/ComfyUI/custom_nodes/comfyui-waas"
+        plugin_dir = os.path.expanduser("~/comfyui/ComfyUI/custom_nodes/comfyui-waas")
 
         # Fetch latest changes
         fetch_result = subprocess.run(
@@ -111,14 +112,48 @@ async def api_update_plugin(request: web.Request) -> web.Response:
             # For example, you might send a signal to a process manager
 
             return web.json_response(
-                {"code": 200, "data": {}, "message": "Plugin updated successfully"}
+                {"code": 200, "data": 1, "message": "云扉插件更新成功，需要重启ComfyUI"}
             )
         else:
             return web.json_response(
-                {"code": 200, "data": {}, "message": "Plugin is already up to date"}
+                {"code": 200, "data": 2, "message": "云扉插件已经是最新版本"}
             )
 
     except Exception as e:
         return web.json_response(
             {"code": 500, "data": {}, "message": f"Update failed: {str(e)}"}, status=500
+        )
+
+
+async def api_restart_comfyui(request: web.Request) -> web.Response:
+    try:
+        # Execute the restart script
+        restart_result = subprocess.run(
+            ["/etc/waas-script/restart_comfyui.sh"],
+            capture_output=True,
+            text=True,
+            timeout=30
+        )
+
+        if restart_result.returncode != 0:
+            return web.json_response(
+                {
+                    "code": 500,
+                    "data": {},
+                    "message": f"Restart failed: {restart_result.stderr}",
+                },
+                status=500,
+            )
+
+        return web.json_response(
+            {"code": 200, "data": {}, "message": "ComfyUI重启命令已执行，请稍等片刻后刷新页面"}
+        )
+
+    except subprocess.TimeoutExpired:
+        return web.json_response(
+            {"code": 500, "data": {}, "message": "重启超时，请手动检查ComfyUI状态"}, status=500
+        )
+    except Exception as e:
+        return web.json_response(
+            {"code": 500, "data": {}, "message": f"Restart failed: {str(e)}"}, status=500
         )

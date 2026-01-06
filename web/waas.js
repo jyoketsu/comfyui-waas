@@ -207,7 +207,19 @@ async function checkForUpdates() {
       if (result.code === 200 && result.data.needs_update) {
         // Show update button or notify user
         console.log("New update available");
-        // You could show a notification or enable the update button
+        showToast("云扉插件有新的更新版本", () => { });
+
+        // Show update badge on the update button
+        const updateBadge = document.getElementById("comfyui-waas-update-badge");
+        if (updateBadge) {
+          updateBadge.style.display = "flex";
+        }
+      } else {
+        // Hide badge if no update needed
+        const updateBadge = document.getElementById("comfyui-waas-update-badge");
+        if (updateBadge) {
+          updateBadge.style.display = "none";
+        }
       }
     }
   } catch (error) {
@@ -220,7 +232,7 @@ app.registerExtension({
   init() {
   },
   async setup() {
-    console.log("[waas] ------------------------------------------------");
+    console.log("[waas] [v1.0.0]------------------------------------------------");
     // 自动加载 CSS
     const link = document.createElement("link");
     link.rel = "stylesheet";
@@ -238,7 +250,7 @@ app.registerExtension({
     checkForUpdates();
 
     function showDropdown() {
-      document.getElementById("comfyui-waas-dropdown").style.height = '142px';
+      document.getElementById("comfyui-waas-dropdown").style.height = '164px';
       document.getElementById("comfyui-waas-dropdown").style.paddingTop = '4px'
       document.getElementById("comfyui-waas-dropdown").style.paddingBottom = '20px'
     }
@@ -250,7 +262,7 @@ app.registerExtension({
     }
 
     function toggleDropdown() {
-      if (document.getElementById("comfyui-waas-dropdown").style.height === '142px') {
+      if (document.getElementById("comfyui-waas-dropdown").style.height === '164px') {
         hideDropdown()
       } else {
         showDropdown()
@@ -366,10 +378,35 @@ app.registerExtension({
       }
     });
 
+    const updateBadge = $el("div", {
+      id: "comfyui-waas-update-badge",
+      style: {
+        position: "absolute",
+        top: "-4px",
+        right: "0px",
+        width: "20px",
+        height: "20px",
+        backgroundColor: "#ff4d4f",
+        borderRadius: "50%",
+        display: "none",
+        justifyContent: "center",
+        alignItems: "center",
+        color: "white",
+        fontSize: "14px",
+        fontWeight: "bold",
+        lineHeight: "1",
+        zIndex: "10",
+      },
+      textContent: "!",
+    });
+
     const updateBtn = $el("button", {
       className: "comfyui-waas-dropdown-btn",
       textContent: "更新插件",
       title: "检查并更新插件到最新版本",
+      style: {
+        position: "relative",
+      },
       onclick: async (event) => {
         const btn = event.target;
         btn.disabled = true;
@@ -384,6 +421,17 @@ app.registerExtension({
             const result = await response.json();
             if (result.code === 200) {
               showToast(result.message, () => { });
+
+              if (result.data === 1) {
+                // 调用重启 API
+                await fetch('/browser/update/restart', {
+                  method: 'POST'
+                });
+                setTimeout(() => {
+                  window.location.reload();
+                }, 2000);
+              }
+
             } else {
               showToast("更新失败: " + result.message, () => { });
             }
@@ -395,10 +443,15 @@ app.registerExtension({
         } finally {
           btn.disabled = false;
           btn.textContent = "更新插件";
+          // Hide badge after successful update
+          const updateBadge = document.getElementById("comfyui-waas-update-badge");
+          if (updateBadge) {
+            updateBadge.style.display = "none";
+          }
           hideDropdown()
         }
       }
-    });
+    }, [updateBadge]);
 
     const docLink = $el("a", {
       href: "https://docs.aigate.cc/bestPractice/aigatePlugin.html",

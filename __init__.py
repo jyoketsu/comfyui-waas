@@ -21,6 +21,7 @@ browser_app.add_routes(
         web.get("/proxy/{tail:.*}", proxy.api_proxy),
         web.post("/update/check-update", update.api_check_update),
         web.post("/update/update", update.api_update_plugin),
+        web.post("/update/restart", update.api_restart_comfyui),
     ]
 )
 server.PromptServer.instance.app.add_subapp("/browser/", browser_app)
