@@ -1,59 +1,67 @@
+import subprocess
 import aiohttp
 from aiohttp import web
+
 
 async def api_check_update(request: web.Request) -> web.Response:
     try:
         plugin_dir = "/home/workspace/yizhi/comfyui-waas"
-        
+
         # Get local commit hash
         local_hash_result = subprocess.run(
-            ["git", "rev-parse", "HEAD"],
-            cwd=plugin_dir,
-            capture_output=True,
-            text=True
+            ["git", "rev-parse", "HEAD"], cwd=plugin_dir, capture_output=True, text=True
         )
-        
+
         if local_hash_result.returncode != 0:
             return web.json_response(
-                {"code": 500, "data": {}, "message": f"Failed to get local hash: {local_hash_result.stderr}"}, 
-                status=500
+                {
+                    "code": 500,
+                    "data": {},
+                    "message": f"Failed to get local hash: {local_hash_result.stderr}",
+                },
+                status=500,
             )
-            
+
         local_hash = local_hash_result.stdout.strip()
-        
+
         # Get remote commit hash
         remote_hash_result = subprocess.run(
             ["git", "rev-parse", "origin/main"],
             cwd=plugin_dir,
             capture_output=True,
-            text=True
+            text=True,
         )
-        
+
         if remote_hash_result.returncode != 0:
             return web.json_response(
-                {"code": 500, "data": {}, "message": f"Failed to get remote hash: {remote_hash_result.stderr}"}, 
-                status=500
+                {
+                    "code": 500,
+                    "data": {},
+                    "message": f"Failed to get remote hash: {remote_hash_result.stderr}",
+                },
+                status=500,
             )
-            
+
         remote_hash = remote_hash_result.stdout.strip()
-        
+
         # Compare hashes
         needs_update = local_hash != remote_hash
-        
-        return web.json_response({
-            "code": 200, 
-            "data": {
-                "needs_update": needs_update,
-                "local_hash": local_hash,
-                "remote_hash": remote_hash
-            }, 
-            "message": "Check completed"
-        })
-        
+
+        return web.json_response(
+            {
+                "code": 200,
+                "data": {
+                    "needs_update": needs_update,
+                    "local_hash": local_hash,
+                    "remote_hash": remote_hash,
+                },
+                "message": "Check completed",
+            }
+        )
+
     except Exception as e:
         return web.json_response(
-            {"code": 500, "data": {}, "message": f"Check failed: {str(e)}"}, 
-            status=500
+            {"code": 500, "data": {}, "message": f"Check failed: {str(e)}"}, status=500
         )
 
 
@@ -61,48 +69,47 @@ async def api_update_plugin(request: web.Request) -> web.Response:
     try:
         # Change to the plugin directory
         plugin_dir = "/home/workspace/yizhi/comfyui-waas"
-        
+
         # Fetch latest changes
         fetch_result = subprocess.run(
-            ["git", "fetch"],
-            cwd=plugin_dir,
-            capture_output=True,
-            text=True
+            ["git", "fetch"], cwd=plugin_dir, capture_output=True, text=True
         )
-        
+
         if fetch_result.returncode != 0:
             return web.json_response(
-                {"code": 500, "data": {}, "message": f"Fetch failed: {fetch_result.stderr}"}, 
-                status=500
+                {
+                    "code": 500,
+                    "data": {},
+                    "message": f"Fetch failed: {fetch_result.stderr}",
+                },
+                status=500,
             )
-            
+
         # Check if there are any updates
         status_result = subprocess.run(
-            ["git", "status", "-uno"],
-            cwd=plugin_dir,
-            capture_output=True,
-            text=True
+            ["git", "status", "-uno"], cwd=plugin_dir, capture_output=True, text=True
         )
-        
+
         if "Your branch is behind" in status_result.stdout:
             # Pull the latest changes
             pull_result = subprocess.run(
-                ["git", "pull"],
-                cwd=plugin_dir,
-                capture_output=True,
-                text=True
+                ["git", "pull"], cwd=plugin_dir, capture_output=True, text=True
             )
-            
+
             if pull_result.returncode != 0:
                 return web.json_response(
-                    {"code": 500, "data": {}, "message": f"Pull failed: {pull_result.stderr}"}, 
-                    status=500
+                    {
+                        "code": 500,
+                        "data": {},
+                        "message": f"Pull failed: {pull_result.stderr}",
+                    },
+                    status=500,
                 )
-                
+
             # Optionally restart the service
             # This depends on how ComfyUI is deployed
             # For example, you might send a signal to a process manager
-            
+
             return web.json_response(
                 {"code": 200, "data": {}, "message": "Plugin updated successfully"}
             )
@@ -110,9 +117,8 @@ async def api_update_plugin(request: web.Request) -> web.Response:
             return web.json_response(
                 {"code": 200, "data": {}, "message": "Plugin is already up to date"}
             )
-            
+
     except Exception as e:
         return web.json_response(
-            {"code": 500, "data": {}, "message": f"Update failed: {str(e)}"}, 
-            status=500
+            {"code": 500, "data": {}, "message": f"Update failed: {str(e)}"}, status=500
         )
