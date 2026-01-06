@@ -232,7 +232,7 @@ app.registerExtension({
   init() {
   },
   async setup() {
-    console.log("[waas] [v1.0.0]------------------------------------------------");
+    console.log("[waas] [v1.0.1]------------------------------------------------");
     // 自动加载 CSS
     const link = document.createElement("link");
     link.rel = "stylesheet";
