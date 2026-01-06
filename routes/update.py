@@ -5,7 +5,7 @@ from aiohttp import web
 
 async def api_check_update(request: web.Request) -> web.Response:
     try:
-        plugin_dir = "/home/workspace/yizhi/comfyui-waas"
+        plugin_dir = "~/comfyui/ComfyUI/custom_nodes/comfyui-waas"
 
         # Get local commit hash
         local_hash_result = subprocess.run(
@@ -68,7 +68,7 @@ async def api_check_update(request: web.Request) -> web.Response:
 async def api_update_plugin(request: web.Request) -> web.Response:
     try:
         # Change to the plugin directory
-        plugin_dir = "/home/workspace/yizhi/comfyui-waas"
+        plugin_dir = "~/comfyui/ComfyUI/custom_nodes/comfyui-waas"
 
         # Fetch latest changes
         fetch_result = subprocess.run(
