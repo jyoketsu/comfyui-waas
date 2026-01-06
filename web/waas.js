@@ -196,6 +196,25 @@ function showToast(text, onClick) {
   }, 1000);
 }
 
+async function checkForUpdates() {
+  try {
+    const response = await fetch("/browser/update/check-update", {
+      method: "POST",
+    });
+
+    if (response.ok) {
+      const result = await response.json();
+      if (result.code === 200 && result.data.needs_update) {
+        // Show update button or notify user
+        console.log("New update available");
+        // You could show a notification or enable the update button
+      }
+    }
+  } catch (error) {
+    console.error("Failed to check for updates:", error);
+  }
+}
+
 app.registerExtension({
   name: "comfyui.waas",
   init() {
@@ -214,6 +233,9 @@ app.registerExtension({
     // Draggable Floating Button
     // ============================
     var isDragging = false;
+
+    // Check for updates when the extension loads
+    checkForUpdates();
 
     function showDropdown() {
       document.getElementById("comfyui-waas-dropdown").style.height = '142px';
@@ -344,6 +366,40 @@ app.registerExtension({
       }
     });
 
+    const updateBtn = $el("button", {
+      className: "comfyui-waas-dropdown-btn",
+      textContent: "更新插件",
+      title: "检查并更新插件到最新版本",
+      onclick: async (event) => {
+        const btn = event.target;
+        btn.disabled = true;
+        btn.textContent = "更新中...";
+
+        try {
+          const response = await fetch("/browser/update/update", {
+            method: "POST",
+          });
+
+          if (response.ok) {
+            const result = await response.json();
+            if (result.code === 200) {
+              showToast(result.message, () => { });
+            } else {
+              showToast("更新失败: " + result.message, () => { });
+            }
+          } else {
+            showToast("更新失败，请重试", () => { });
+          }
+        } catch (error) {
+          showToast("更新失败: " + error.message, () => { });
+        } finally {
+          btn.disabled = false;
+          btn.textContent = "更新插件";
+          hideDropdown()
+        }
+      }
+    });
+
     const docLink = $el("a", {
       href: "https://docs.aigate.cc/bestPractice/aigatePlugin.html",
       target: "_blank",
@@ -387,6 +443,7 @@ app.registerExtension({
         btn1,
         btn2,
         btn3,
+        updateBtn,
         $el("button", {
           className: "comfyui-waas-dropdown-btn",
           textContent: "收起",

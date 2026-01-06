@@ -5,6 +5,7 @@ import server
 from .routes import (
     models,
     proxy,
+    update,
 )
 
 browser_path = path.dirname(__file__)
@@ -18,6 +19,8 @@ browser_app.add_routes(
         web.post("/models/refresh", models.api_refresh_models),
         web.post("/models/envs", models.api_get_envs),
         web.get("/proxy/{tail:.*}", proxy.api_proxy),
+        web.post("/update/check-update", update.api_check_update),
+        web.post("/update/update", update.api_update_plugin),
     ]
 )
 server.PromptServer.instance.app.add_subapp("/browser/", browser_app)
