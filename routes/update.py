@@ -8,6 +8,21 @@ async def api_check_update(request: web.Request) -> web.Response:
     try:
         plugin_dir = os.path.expanduser("~/comfyui/ComfyUI/custom_nodes/comfyui-waas")
 
+        # 先从远程获取最新信息
+        fetch_result = subprocess.run(
+            ["git", "fetch"], cwd=plugin_dir, capture_output=True, text=True
+        )
+        
+        if fetch_result.returncode != 0:
+            return web.json_response(
+                {
+                    "code": 500,
+                    "data": {},
+                    "message": f"Fetch failed: {fetch_result.stderr}",
+                },
+                status=500,
+            )
+
         # Get local commit hash
         local_hash_result = subprocess.run(
             ["git", "rev-parse", "HEAD"], cwd=plugin_dir, capture_output=True, text=True
@@ -86,12 +101,45 @@ async def api_update_plugin(request: web.Request) -> web.Response:
                 status=500,
             )
 
-        # Check if there are any updates
-        status_result = subprocess.run(
-            ["git", "status", "-uno"], cwd=plugin_dir, capture_output=True, text=True
+        # Get local commit hash
+        local_hash_result = subprocess.run(
+            ["git", "rev-parse", "HEAD"], cwd=plugin_dir, capture_output=True, text=True
         )
 
-        if "Your branch is behind" in status_result.stdout:
+        if local_hash_result.returncode != 0:
+            return web.json_response(
+                {
+                    "code": 500,
+                    "data": {},
+                    "message": f"Failed to get local hash: {local_hash_result.stderr}",
+                },
+                status=500,
+            )
+
+        local_hash = local_hash_result.stdout.strip()
+
+        # Get remote commit hash
+        remote_hash_result = subprocess.run(
+            ["git", "rev-parse", "origin/main"],
+            cwd=plugin_dir,
+            capture_output=True,
+            text=True,
+        )
+
+        if remote_hash_result.returncode != 0:
+            return web.json_response(
+                {
+                    "code": 500,
+                    "data": {},
+                    "message": f"Failed to get remote hash: {remote_hash_result.stderr}",
+                },
+                status=500,
+            )
+
+        remote_hash = remote_hash_result.stdout.strip()
+
+        # Compare hashes to check if update is needed
+        if local_hash != remote_hash:
             # Pull the latest changes
             pull_result = subprocess.run(
                 ["git", "pull"], cwd=plugin_dir, capture_output=True, text=True

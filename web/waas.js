@@ -422,6 +422,12 @@ app.registerExtension({
             if (result.code === 200) {
               showToast(result.message, () => { });
 
+              // Hide badge after successful update
+              const updateBadge = document.getElementById("comfyui-waas-update-badge");
+              if (updateBadge) {
+                updateBadge.style.display = "none";
+              }
+              
               if (result.data === 1) {
                 // 调用重启 API
                 await fetch('/browser/update/restart', {
@@ -443,11 +449,6 @@ app.registerExtension({
         } finally {
           btn.disabled = false;
           btn.textContent = "更新插件";
-          // Hide badge after successful update
-          const updateBadge = document.getElementById("comfyui-waas-update-badge");
-          if (updateBadge) {
-            updateBadge.style.display = "none";
-          }
           hideDropdown()
         }
       }
