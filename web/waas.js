@@ -279,7 +279,7 @@ app.registerExtension({
   init() {
   },
   async setup() {
-    console.log("[waas] [v1.0.2]------------------------------------------------");
+    console.log("[waas] [v1.0.3]------------------------------------------------");
     // 自动加载 CSS
     const link = document.createElement("link");
     link.rel = "stylesheet";
