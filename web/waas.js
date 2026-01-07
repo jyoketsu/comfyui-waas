@@ -227,6 +227,53 @@ async function checkForUpdates() {
   }
 }
 
+/**
+ * 轮询检测 ComfyUI 后端服务健康状态
+ * 只有在服务完全恢复响应后才刷新页面
+ */
+async function pollServiceHealth() {
+  const maxRetries = 120; // 最大重试次数（120次 * 2秒 = 最多等待4分钟）
+  const retryInterval = 2000; // 每次重试间隔2秒
+  let retryCount = 0;
+
+  // 显示正在等待服务恢复的提示
+  showToast("ComfyUI 正在重启中，请稍候...", () => { });
+
+  while (retryCount < maxRetries) {
+    try {
+      // 检测服务是否可访问
+      const response = await fetch('/queue', {
+        method: 'GET',
+        cache: 'no-cache',
+        signal: AbortSignal.timeout(5000)
+      });
+
+      if (response.ok) {
+        // 服务已恢复，刷新页面
+        showToast("ComfyUI 服务已恢复，正在刷新页面...", () => { });
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
+        return;
+      }
+    } catch (error) {
+      // 服务尚未恢复，继续等待
+      console.log(`等待服务恢复... (${retryCount + 1}/${maxRetries})`);
+    }
+
+    retryCount++;
+
+    // 如果还未达到最大重试次数，继续等待
+    if (retryCount < maxRetries) {
+      await new Promise(resolve => setTimeout(resolve, retryInterval));
+    }
+  }
+
+  // 达到最大重试次数仍未恢复
+  showToast("ComfyUI 重启超时，请手动刷新页面", () => { });
+  console.error("服务健康检查超时，请手动检查 ComfyUI 状态");
+}
+
 app.registerExtension({
   name: "comfyui.waas",
   init() {
@@ -433,9 +480,9 @@ app.registerExtension({
                 await fetch('/browser/update/restart', {
                   method: 'POST'
                 });
-                setTimeout(() => {
-                  window.location.reload();
-                }, 2000);
+
+                // 基于服务健康状态的轮询机制
+                await pollServiceHealth();
               }
 
             } else {
