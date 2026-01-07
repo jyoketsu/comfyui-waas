@@ -232,7 +232,7 @@ app.registerExtension({
   init() {
   },
   async setup() {
-    console.log("[waas] [v1.0.1]------------------------------------------------");
+    console.log("[waas] [v1.0.2]------------------------------------------------");
     // 自动加载 CSS
     const link = document.createElement("link");
     link.rel = "stylesheet";
@@ -427,7 +427,7 @@ app.registerExtension({
               if (updateBadge) {
                 updateBadge.style.display = "none";
               }
-              
+
               if (result.data === 1) {
                 // 调用重启 API
                 await fetch('/browser/update/restart', {
