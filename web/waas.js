@@ -322,7 +322,7 @@ app.registerExtension({
       title: "收入大量常用模型，可自主选择同步",
       onclick: () => {
         browserDialog.show()
-        hideDropdown()
+        // hideDropdown()
       }
     });
 
@@ -376,7 +376,7 @@ app.registerExtension({
         } catch (error) {
           showToast("获取共享盘失败", () => { });
         } finally {
-          hideDropdown()
+          // hideDropdown()
         }
       }
     });
@@ -420,7 +420,7 @@ app.registerExtension({
         } finally {
           btn.disabled = false;
           btn.textContent = "刷新models";
-          hideDropdown()
+          // hideDropdown()
         }
       }
     });
@@ -496,7 +496,7 @@ app.registerExtension({
         } finally {
           btn.disabled = false;
           btn.textContent = "更新插件";
-          hideDropdown()
+          // hideDropdown()
         }
       }
     }, [updateBadge]);
