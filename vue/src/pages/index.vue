@@ -2,8 +2,9 @@
 import Iconfont from '@/components/common/Iconfont.vue';
 import { ElLoading, ElMessage } from 'element-plus';
 import { sync, getInEffectiveModels, clear, getModels, searchModels } from '@/api/models';
-import { ref, watch } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import { useDebounceFn } from '@vueuse/core';
+import NewModels from './NewModels.vue';
 
 const ineffectiveDialogVisible = ref(false);
 const loading = ref(false)
@@ -17,6 +18,8 @@ const ineffectiveModels = ref<{
 }[]>([])
 const name = ref('');
 const isSelectAll = ref(false)
+const newModels = ref([]);
+const newModelDialogVisible = ref(false);
 
 const handleSync = async () => {
 	if (!selectedMedia.value.length) {
@@ -146,9 +149,20 @@ const handleClickNav = (index: number) => {
 	name.value = ''
 }
 
+const getNewModels = async () => {
+	const res: any = await getModels('/', undefined, '1')
+	if (res.code === 0) {
+		newModels.value = res.data
+	}
+}
+
 watch(paths, (newVal) => {
 	handleGetModels(newVal.length ? newVal.join('/') : '/')
 }, { immediate: true })
+
+onMounted(() => {
+	getNewModels();
+})
 </script>
 
 <template>
@@ -158,6 +172,14 @@ watch(paths, (newVal) => {
 				网罗大量ComfyUI常用模型，秒级同步，为您节省 <span class="text-[var(--el-color-primary)] font-bold">{{ `${3.9}TB` }}</span> 存储空间
 			</p>
 			<p>初次使用ComfyUI镜像建议同步所有模型</p>
+			<p v-if="newModels.length" class="flex items-center">
+				<Iconfont icon="xiangxixinxi" class="mr-1" />
+				<span>有新模型，建议同步</span>
+				<el-button type="primary" link class="text-[16px] ml-3 hover:!text-[var(--el-color-primary-dark-2)]"
+					@click="newModelDialogVisible = true">
+					立即查看
+				</el-button>
+			</p>
 		</div>
 		<div class="px-10 flex justify-between items-center">
 			<div class="flex items-center space-x-2">
@@ -238,4 +260,5 @@ watch(paths, (newVal) => {
 			</div>
 		</template>
 	</el-dialog>
+	<NewModels v-model:visible="newModelDialogVisible" :models="newModels" />
 </template>

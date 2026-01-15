@@ -17,9 +17,9 @@ REMOTE_PATH="~/comfyui/ComfyUI/custom_nodes"
 # PASSWORD="b39b988f3561446c9d8115d7310ea1f8"
 
 REMOTE_USER="root"
-REMOTE_HOST="2aada5fffb7b4bf8a0569d6a50409416.region2.waas.aigate.cc"
-REMOTE_PORT="45690"
-PASSWORD="d5b4558bb831408b9f68db044b5a1adb"
+REMOTE_HOST="f74b6ce0a93543679e97d3c2617aeeec.region2.waas.aigate.cc"
+REMOTE_PORT="49443"
+PASSWORD="e37a571a33cd46cab769657dca9c26e3"
 
 echo "开始部署..."
 

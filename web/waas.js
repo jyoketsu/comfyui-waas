@@ -227,6 +227,31 @@ async function checkForUpdates() {
   }
 }
 
+async function checkForNewModel() {
+  try {
+    const response = await fetch(`/browser/proxy/product/comfyuiModel/list?path=/&isNew=1`, {
+      method: "GET",
+    });
+
+    if (response.ok) {
+      const result = await response.json();
+      if (result.code === 0 && result.data && result.data.length > 0) {
+        const newBadge = document.getElementById("comfyui-waas-new-model-badge");
+        if (newBadge) {
+          newBadge.style.display = "flex";
+        }
+      } else {
+        const newBadge = document.getElementById("comfyui-waas-new-model-badge");
+        if (newBadge) {
+          newBadge.style.display = "none";
+        }
+      }
+    }
+  } catch (error) {
+    console.error("Failed to check for new models:", error);
+  }
+}
+
 /**
  * 轮询检测 ComfyUI 后端服务健康状态
  * 只有在服务完全恢复响应后才刷新页面
@@ -295,6 +320,7 @@ app.registerExtension({
 
     // Check for updates when the extension loads
     checkForUpdates();
+    checkForNewModel();
 
     function showDropdown() {
       document.getElementById("comfyui-waas-dropdown").style.height = '164px';
@@ -320,6 +346,9 @@ app.registerExtension({
       className: "comfyui-waas-dropdown-btn",
       textContent: "云扉公模库",
       title: "收入大量常用模型，可自主选择同步",
+      style: {
+        position: "relative",
+      },
       onclick: () => {
         browserDialog.show()
         // hideDropdown()
@@ -525,6 +554,28 @@ app.registerExtension({
       })
     ]);
 
+    const newModelBadge = $el("div", {
+      id: "comfyui-waas-new-model-badge",
+      style: {
+        position: "absolute",
+        top: "72px",
+        right: "-50px",
+        padding: '0 5px',
+        height: "20px",
+        backgroundColor: "#ff4d4f",
+        borderRadius: "5px",
+        display: "none",
+        // display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        color: "white",
+        fontSize: "12px",
+        lineHeight: "20px",
+        zIndex: "10",
+      },
+      textContent: "有新模型！",
+    });
+
     const floatBtn = $el("div", {
       id: "comfyui-waas-btn",
     }, [
@@ -537,7 +588,7 @@ app.registerExtension({
           }
           toggleDropdown();
         }
-      }, [tip]),
+      }, [tip, newModelBadge]),
       $el("div", {
         id: "comfyui-waas-dropdown",
       }, [

@@ -1,10 +1,11 @@
 import { request } from "@/api/index";
 const isDev = import.meta.env.DEV
 
-export function getModels(path: string, name?: string) {
+export function getModels(path: string, name?: string, isNew?: string) {
   return request.get(isDev ? '/api/product/comfyuiModel/list' : "/browser/proxy/product/comfyuiModel/list", {
     path,
     name,
+    isNew,
   });
 }
 
