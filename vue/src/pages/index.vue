@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import Iconfont from '@/components/common/Iconfont.vue';
 import { ElLoading, ElMessage } from 'element-plus';
-import { sync, getInEffectiveModels, clear, getModels, searchModels } from '@/api/models';
+import { sync, getInEffectiveModels, clear, getModels, searchModels, getNewModelList } from '@/api/models';
 import { onMounted, ref, watch } from 'vue';
 import { useDebounceFn } from '@vueuse/core';
 import NewModels from './NewModels.vue';
@@ -150,7 +150,7 @@ const handleClickNav = (index: number) => {
 }
 
 const getNewModels = async () => {
-	const res: any = await getModels('/', undefined, '1')
+	const res: any = await getNewModelList()
 	if (res.code === 0) {
 		newModels.value = res.data
 	}

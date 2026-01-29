@@ -9,6 +9,10 @@ export function getModels(path: string, name?: string, isNew?: string) {
   });
 }
 
+export function getNewModelList() {
+  return request.get(isDev ? '/api/product/comfyuiModel/listNew' : "/browser/proxy/product/comfyuiModel/listNew");
+}
+
 export function searchModels(name: string) {
   return request.get(isDev ? '/api/product/comfyuiModel/search' : "/browser/proxy/product/comfyuiModel/search", {
     name,

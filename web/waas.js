@@ -229,7 +229,7 @@ async function checkForUpdates() {
 
 async function checkForNewModel() {
   try {
-    const response = await fetch(`/browser/proxy/product/comfyuiModel/list?path=/&isNew=1`, {
+    const response = await fetch(`/browser/proxy/product/comfyuiModel/listNew`, {
       method: "GET",
     });
 
