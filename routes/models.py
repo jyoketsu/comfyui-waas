@@ -120,28 +120,29 @@ Return stats:
 
 def _link_files_under_root(
     src_root: str, dst_path: str, dest_rel_root: str | None = None
-) -> Dict[str, int]:
-    stats = {"total_files": 0, "succeeded": 0, "failed": 0, "skipped": 0}
+) -> Dict[str, Any]:
+    stats: Dict[str, Any] = {"total_files": 0, "succeeded": 0, "failed": 0, "skipped": 0, "failed_items": []}
 
     if not path.exists(src_root):
         return stats
 
     if path.isfile(src_root):
         stats["total_files"] += 1
-        if dest_rel_root:
-            dst_file = path.join(dst_path, dest_rel_root)
-            os.makedirs(path.dirname(dst_file), exist_ok=True)
-        else:
-            os.makedirs(dst_path, exist_ok=True)
-            dst_file = path.join(dst_path, path.basename(src_root))
-        if path.exists(dst_file) or path.islink(dst_file):
-            stats["skipped"] += 1
-            return stats
         try:
+            if dest_rel_root:
+                dst_file = path.join(dst_path, dest_rel_root)
+                os.makedirs(path.dirname(dst_file), exist_ok=True)
+            else:
+                os.makedirs(dst_path, exist_ok=True)
+                dst_file = path.join(dst_path, path.basename(src_root))
+            if path.exists(dst_file) or path.islink(dst_file):
+                stats["skipped"] += 1
+                return stats
             os.symlink(src_root, dst_file)
             stats["succeeded"] += 1
         except Exception:
             stats["failed"] += 1
+            stats["failed_items"].append(dest_rel_root or path.basename(src_root))
         return stats
 
     if not path.isdir(src_root):
@@ -152,12 +153,33 @@ def _link_files_under_root(
     else:
         base_name = path.basename(src_root.rstrip(path.sep))
         root_target = path.join(dst_path, base_name)
-    os.makedirs(root_target, exist_ok=True)
+
+    try:
+        os.makedirs(root_target, exist_ok=True)
+    except Exception:
+        # root_target creation failed, count all files as failed
+        for dirpath, _, filenames in os.walk(src_root, followlinks=False):
+            rel_dir = path.relpath(dirpath, src_root)
+            stats["total_files"] += len(filenames)
+            stats["failed"] += len(filenames)
+            for f in filenames:
+                rel_file = path.join(rel_dir, f) if rel_dir != "." else f
+                stats["failed_items"].append(rel_file)
+        return stats
 
     for dirpath, _, filenames in os.walk(src_root, followlinks=False):
         rel_dir = path.relpath(dirpath, src_root)
         target_dir = path.join(root_target, rel_dir) if rel_dir != "." else root_target
-        os.makedirs(target_dir, exist_ok=True)
+
+        try:
+            os.makedirs(target_dir, exist_ok=True)
+        except Exception:
+            # target_dir creation failed, skip files in this directory
+            stats["failed"] += len(filenames)
+            for f in filenames:
+                rel_file = path.join(rel_dir, f) if rel_dir != "." else f
+                stats["failed_items"].append(rel_file)
+            continue
 
         for f in filenames:
             stats["total_files"] += 1
@@ -173,6 +195,8 @@ def _link_files_under_root(
                 stats["succeeded"] += 1
             except Exception:
                 stats["failed"] += 1
+                rel_file = path.join(rel_dir, f) if rel_dir != "." else f
+                stats["failed_items"].append(rel_file)
 
     return stats
 
