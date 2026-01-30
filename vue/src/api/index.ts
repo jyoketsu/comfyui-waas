@@ -11,6 +11,9 @@ export const request = {
           method: "get",
           url: path,
           params: params,
+          // headers: {
+          //   "VERSION": "prewaas"
+          // }
         });
         resolve(response.data);
       } catch (error) {
@@ -95,10 +98,10 @@ axios.interceptors.response.use(
   (response) => response, // 请求成功直接返回
   async (error) => {
     console.log('error', error);
-    
+
     ElMessage.error(error.response && error.response.data
-        ? error.response.data.msg
-        : error.message
+      ? error.response.data.msg
+      : error.message
     );
     // 其他错误情况直接返回错误信息
     return Promise.reject(

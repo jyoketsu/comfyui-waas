@@ -174,10 +174,11 @@ const handleClickNav = (index: number) => {
 }
 
 const getNewModels = async () => {
-	const res: any = await getNewModelList()
-	if (res.code === 0) {
-		newModels.value = res.data
-	}
+	// todo
+	// const res: any = await getNewModelList()
+	// if (res.code === 0) {
+	// 	newModels.value = res.data
+	// }
 }
 
 watch(paths, (newVal) => {

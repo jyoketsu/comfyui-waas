@@ -231,6 +231,9 @@ async function checkForNewModel() {
   try {
     const response = await fetch(`/browser/proxy/product/comfyuiModel/listNew`, {
       method: "GET",
+      // headers: {
+      //   "VERSION": "prewaas"
+      // }
     });
 
     if (response.ok) {
@@ -320,7 +323,8 @@ app.registerExtension({
 
     // Check for updates when the extension loads
     checkForUpdates();
-    checkForNewModel();
+    // todo
+    // checkForNewModel();
 
     function showDropdown() {
       document.getElementById("comfyui-waas-dropdown").style.height = '164px';
