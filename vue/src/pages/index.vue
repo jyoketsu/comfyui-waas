@@ -5,6 +5,7 @@ import { sync, getInEffectiveModels, clear, getModels, searchModels, getNewModel
 import { onMounted, ref, watch } from 'vue';
 import { useDebounceFn } from '@vueuse/core';
 import NewModels from './NewModels.vue';
+import FailedModels from './FailedModels.vue';
 
 const ineffectiveDialogVisible = ref(false);
 const loading = ref(false)
@@ -20,6 +21,8 @@ const name = ref('');
 const isSelectAll = ref(false)
 const newModels = ref([]);
 const newModelDialogVisible = ref(false);
+const failedModels = ref<any[]>([]);
+const failedModelDialogVisible = ref(false);
 
 const handleSync = async () => {
 	if (!selectedMedia.value.length) {
@@ -36,8 +39,29 @@ const handleSync = async () => {
 		// 测试
 		// await sync(`/dataset/ComfyUI/models`, selectedMedia.value, '/home/waas/ComfyUI/models')
 		// 生产
-		await sync(`/datasets/ComfyUI/models`, selectedMedia.value, '/home/waas/ComfyUI/models')
-		ElMessage.success('模型同步成功')
+		const res: any = await sync(`/datasets/ComfyUI/models`, selectedMedia.value, '/home/waas/ComfyUI/models')
+		if (res.code === 200) {
+			const data = res.data?.result;
+			let failedItems = [];
+			
+			const keys = Object.keys(data);
+
+			for (let index = 0; index < keys.length; index++) {
+				const item = data[keys[index]];
+				if (item.failed_items?.length) {
+					failedItems.push(...item.failed_items)
+				}
+			}
+			
+			if (failedItems.length) {
+				failedModels.value = failedItems;
+				failedModelDialogVisible.value = true;
+			} else {
+				ElMessage.success('模型同步成功')
+			}
+		} else {
+			ElMessage.error(res.message || '模型同步失败')
+		}
 	} catch (error) {
 	} finally {
 		loading.close();
@@ -261,4 +285,5 @@ onMounted(() => {
 		</template>
 	</el-dialog>
 	<NewModels v-model:visible="newModelDialogVisible" :models="newModels" />
+	<FailedModels v-model:visible="failedModelDialogVisible" :models="failedModels" />
 </template>
