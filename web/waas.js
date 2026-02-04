@@ -323,8 +323,7 @@ app.registerExtension({
 
     // Check for updates when the extension loads
     checkForUpdates();
-    // todo
-    // checkForNewModel();
+    checkForNewModel();
 
     function showDropdown() {
       document.getElementById("comfyui-waas-dropdown").style.height = '164px';

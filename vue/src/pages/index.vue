@@ -43,7 +43,7 @@ const handleSync = async () => {
 		if (res.code === 200) {
 			const data = res.data?.result;
 			let failedItems = [];
-			
+
 			const keys = Object.keys(data);
 
 			for (let index = 0; index < keys.length; index++) {
@@ -52,7 +52,7 @@ const handleSync = async () => {
 					failedItems.push(...item.failed_items)
 				}
 			}
-			
+
 			if (failedItems.length) {
 				failedModels.value = failedItems;
 				failedModelDialogVisible.value = true;
@@ -174,11 +174,10 @@ const handleClickNav = (index: number) => {
 }
 
 const getNewModels = async () => {
-	// todo
-	// const res: any = await getNewModelList()
-	// if (res.code === 0) {
-	// 	newModels.value = res.data
-	// }
+	const res: any = await getNewModelList()
+	if (res.code === 0) {
+		newModels.value = res.data
+	}
 }
 
 watch(paths, (newVal) => {
@@ -198,8 +197,8 @@ onMounted(() => {
 			</p>
 			<p>初次使用ComfyUI镜像建议同步所有模型</p>
 			<p v-if="newModels.length" class="flex items-center">
-				<Iconfont icon="xiangxixinxi" class="mr-1" />
-				<span>有新模型，建议同步</span>
+				<Iconfont icon="xiangxixinxi" class="mr-1 !text-[#FF4D4F]" />
+				<span class="text-[#FF4D4F]">有新模型，建议同步</span>
 				<el-button type="primary" link class="text-[16px] ml-3 hover:!text-[var(--el-color-primary-dark-2)]"
 					@click="newModelDialogVisible = true">
 					立即查看
