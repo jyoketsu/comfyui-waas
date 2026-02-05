@@ -509,8 +509,8 @@ app.registerExtension({
 
               if (result.data === 1) {
                 // 调用重启 API
-                await fetch('/browser/update/restart', {
-                  method: 'POST'
+                await fetch('/api/manager/reboot', {
+                  method: 'GET'
                 });
 
                 // 基于服务健康状态的轮询机制
